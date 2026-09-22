@@ -1,7 +1,9 @@
+import BannerSection from "@/components/BannerSection";
+
 export default function Home() {
   return (
     <div>
-      <h1>Fable ebook share platform</h1>
+      <BannerSection />
     </div>
   );
 }
