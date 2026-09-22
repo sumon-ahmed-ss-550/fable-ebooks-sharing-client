@@ -6,11 +6,27 @@ const client = new MongoClient(process.env.MONGODB_URI);
 const db = client.db(process.env.DATABASE_NAME);
 
 export const auth = betterAuth({
+  emailAndPassword: {
+    enabled: true,
+  },
+
   database: mongodbAdapter(db, {
-    emailAndPassword: {
-      enabled: true,
-    },
     // Optional: if you don't provide a client, database transactions won't be enabled.
     client,
   }),
+
+  // additional fields
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        default: "reader",
+      },
+
+      agreeToTerms: {
+        type: "boolean",
+        default: false,
+      },
+    },
+  },
 });

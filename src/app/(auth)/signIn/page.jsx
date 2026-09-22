@@ -14,6 +14,8 @@ import {
   Sparkles,
 } from "@gravity-ui/icons";
 import { FcGoogle } from "react-icons/fc";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -21,10 +23,21 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+
+    const { data, error } = await authClient.signIn.email({
+      email,
+      password,
+    });
+
+    if (data) {
+      router.push("/");
+    }
+
     // Submit logic here
     setTimeout(() => setIsLoading(false), 1500);
   };

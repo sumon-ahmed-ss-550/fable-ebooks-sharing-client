@@ -14,13 +14,18 @@ import {
   ArrowRightToSquare,
   ArrowRightFromSquare,
 } from "@gravity-ui/icons";
+import { authClient } from "@/lib/auth-client";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // user session
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
+
   // Mock authentication state
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -81,26 +86,26 @@ export default function Navbar() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            {isLoggedIn ? (
+            {user ? (
               <Button
                 color="danger"
                 variant="flat"
                 startContent={<ArrowRightFromSquare width={16} height={16} />}
-                onClick={() => setIsLoggedIn(false)}
                 className="font-medium"
               >
                 Logout
               </Button>
             ) : (
-              <Button
-                color="primary"
-                variant="solid"
-                startContent={<ArrowRightToSquare width={16} height={16} />}
-                onClick={() => setIsLoggedIn(true)}
-                className="font-medium bg-indigo-600 text-white hover:bg-indigo-700"
-              >
-                Login
-              </Button>
+              <Link href="/signIn">
+                <Button
+                  color="primary"
+                  variant="solid"
+                  startContent={<ArrowRightToSquare width={16} height={16} />}
+                  className="font-medium bg-indigo-600 text-white hover:bg-indigo-700"
+                >
+                  Login
+                </Button>
+              </Link>
             )}
           </div>
 
@@ -150,8 +155,9 @@ export default function Navbar() {
                 );
               })}
 
+              {/* Mobile Auth Buttons */}
               <div className="pt-4 mt-2 border-t border-slate-200 dark:border-slate-800">
-                {isLoggedIn ? (
+                {user ? (
                   <Button
                     color="danger"
                     variant="flat"
@@ -160,7 +166,6 @@ export default function Navbar() {
                       <ArrowRightFromSquare width={18} height={18} />
                     }
                     onClick={() => {
-                      setIsLoggedIn(false);
                       setIsMobileMenuOpen(false);
                     }}
                     className="justify-center font-medium"
@@ -168,19 +173,22 @@ export default function Navbar() {
                     Logout
                   </Button>
                 ) : (
-                  <Button
-                    color="primary"
-                    variant="solid"
-                    fullWidth
-                    startContent={<ArrowRightToSquare width={18} height={18} />}
-                    onClick={() => {
-                      setIsLoggedIn(true);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="justify-center font-medium bg-indigo-600 text-white hover:bg-indigo-700"
-                  >
-                    Login
-                  </Button>
+                  <Link href="/signIn">
+                    <Button
+                      color="primary"
+                      variant="solid"
+                      fullWidth
+                      startContent={
+                        <ArrowRightToSquare width={18} height={18} />
+                      }
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="justify-center font-medium bg-indigo-600 text-white hover:bg-indigo-700"
+                    >
+                      Login
+                    </Button>
+                  </Link>
                 )}
               </div>
             </div>

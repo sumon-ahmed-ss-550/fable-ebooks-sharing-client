@@ -17,6 +17,7 @@ import {
   CircleExclamation,
 } from "@gravity-ui/icons";
 import { FcGoogle } from "react-icons/fc";
+import { authClient } from "@/lib/auth-client";
 
 export default function SignUpPage() {
   // Form State
@@ -62,17 +63,15 @@ export default function SignUpPage() {
     setIsLoading(true);
     setErrorMessage("");
 
-    // form data
-    const formData = {
-      fullName: fullName,
-      email: email,
-      password: password,
-      confirmPassword: confirmPassword,
-      agreeToTerms: agreeToTerms,
-      role: selectedRole,
-    };
-
     try {
+      const { data, error } = await authClient.signUp.email({
+        name: fullName,
+        email,
+        password,
+        role: selectedRole,
+        agreeToTerms,
+      });
+
       await new Promise((resolve) => setTimeout(resolve, 1500));
       // Registration complete state (No JWT token storage, no redirection)
       setIsSubmitted(true);
