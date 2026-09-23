@@ -71,6 +71,7 @@ export default function SignUpPage() {
         role: selectedRole,
         agreeToTerms,
       });
+      await authClient.signOut();
 
       await new Promise((resolve) => setTimeout(resolve, 1500));
       // Registration complete state (No JWT token storage, no redirection)
@@ -89,6 +90,10 @@ export default function SignUpPage() {
   const handleGoogleSignUp = async () => {
     setIsLoading(true);
     try {
+      await authClient.signIn.social({
+        provider: "google",
+      });
+
       await new Promise((resolve) => setTimeout(resolve, 1200));
       setIsSubmitted(true);
     } catch (err) {

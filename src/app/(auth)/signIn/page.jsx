@@ -42,6 +42,13 @@ export default function SignInPage() {
     setTimeout(() => setIsLoading(false), 1500);
   };
 
+  // handle signIn with google
+  const handleGoogleSignIn = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+    });
+  };
+
   return (
     <main className="min-h-[85vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 relative overflow-hidden bg-slate-50 dark:bg-slate-950">
       {/* Dynamic Ambient Blurs */}
@@ -87,6 +94,7 @@ export default function SignInPage() {
               type="button"
               variant="bordered"
               size="lg"
+              onClick={handleGoogleSignIn}
               className="w-full font-medium border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
             >
               <FcGoogle width={18} height={18} />

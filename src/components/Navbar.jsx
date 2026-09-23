@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@heroui/react";
 
@@ -19,6 +19,7 @@ import { authClient } from "@/lib/auth-client";
 export default function Navbar() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const router = useRouter();
 
   // user session
   const { data: session, isPending } = authClient.useSession();
@@ -32,8 +33,19 @@ export default function Navbar() {
     { name: "Browse Ebooks", path: "/browse" },
     { name: "Dashboard", path: "/dashboard" },
   ];
-
   const isActiveRoute = (path) => pathname === path;
+
+  // handle sign out function
+  const handleSignOut = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/signIn");
+        },
+      },
+    });
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
@@ -86,11 +98,12 @@ export default function Navbar() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            {user ? (
+            {isPending ? null : user ? (
               <Button
                 color="danger"
                 variant="flat"
                 startContent={<ArrowRightFromSquare width={16} height={16} />}
+                onClick={handleSignOut}
                 className="font-medium"
               >
                 Logout
@@ -157,7 +170,7 @@ export default function Navbar() {
 
               {/* Mobile Auth Buttons */}
               <div className="pt-4 mt-2 border-t border-slate-200 dark:border-slate-800">
-                {user ? (
+                {isPending ? null : user ? (
                   <Button
                     color="danger"
                     variant="flat"
@@ -165,9 +178,7 @@ export default function Navbar() {
                     startContent={
                       <ArrowRightFromSquare width={18} height={18} />
                     }
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                    }}
+                    onClick={handleSignOut}
                     className="justify-center font-medium"
                   >
                     Logout
