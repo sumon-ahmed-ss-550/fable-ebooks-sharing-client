@@ -25,14 +25,22 @@ export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
-  // Mock authentication state
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  // navigation links
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Browse Ebooks", path: "/browse" },
-    { name: "Dashboard", path: "/dashboard" },
   ];
+
+  // push dashboard in navLinks
+  if (user) {
+    const selectedPath = {
+      reader: "/dashboard/reader",
+      writer: "/dashboard/writer",
+      admin: "/dashboard/admin",
+    };
+
+    navLinks.push({ name: "Dashboard", path: selectedPath[user?.role] });
+  }
   const isActiveRoute = (path) => pathname === path;
 
   // handle sign out function
