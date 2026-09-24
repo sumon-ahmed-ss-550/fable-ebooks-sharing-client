@@ -1,6 +1,6 @@
 import React from "react";
 
-const EditEbookPage = () => {
+const WriterEditEbookPage = () => {
   return (
     <div>
       <h2>edit ebook page</h2>
@@ -8,4 +8,4 @@ const EditEbookPage = () => {
   );
 };
 
-export default EditEbookPage;
+export default WriterEditEbookPage;

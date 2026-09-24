@@ -29,13 +29,23 @@ export default function SignInPage() {
     e.preventDefault();
     setIsLoading(true);
 
+    // signIn information
     const { data, error } = await authClient.signIn.email({
       email,
       password,
     });
+    const user = data?.user;
 
+    // selected redirect path with role
+    const selectedPath = {
+      reader: "/",
+      writer: "/dashboard/writer",
+      admin: "/dashboard/admin",
+    };
+
+    // redirect role base
     if (data) {
-      router.push("/");
+      router.push(selectedPath[user?.role]);
     }
 
     // Submit logic here

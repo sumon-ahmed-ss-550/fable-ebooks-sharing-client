@@ -1,11 +1,11 @@
 import React from "react";
 
-const ReaderLayoutPage = () => {
+const ReaderPurchaseHistoryPage = () => {
   return (
     <div>
-      <h2>reader layout page</h2>
+      <h2>reader purchase history page</h2>
     </div>
   );
 };
 
-export default ReaderLayoutPage;
+export default ReaderPurchaseHistoryPage;

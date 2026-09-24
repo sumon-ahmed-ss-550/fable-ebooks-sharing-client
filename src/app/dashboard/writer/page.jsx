@@ -1,6 +1,6 @@
 import React from "react";
 
-const WriterLayoutPage = () => {
+const WriterHomePage = () => {
   return (
     <div>
       <h2>manage ebook page</h2>
@@ -8,4 +8,4 @@ const WriterLayoutPage = () => {
   );
 };
 
-export default WriterLayoutPage;
+export default WriterHomePage;

@@ -5,6 +5,8 @@ import {
   BookOpen,
   ChartBar,
   ClockArrowRotateLeft,
+  CreditCard,
+  House,
   Pencil,
   Person,
 } from "@gravity-ui/icons";
@@ -23,10 +25,26 @@ export async function LayoutContent() {
 
   // reader nav items
   const readerNavItems = [
-    { icon: ClockArrowRotateLeft, label: "Purchase History", href: "#" },
-    { icon: BookOpen, label: "Purchased Ebooks", href: "#" },
-    { icon: Person, label: "Profile Management", href: "#" },
-    { icon: Bookmark, label: "Bookmark Page", href: "#" },
+    {
+      icon: ClockArrowRotateLeft,
+      label: "Purchase History",
+      href: "/dashboard/reader",
+    },
+    {
+      icon: BookOpen,
+      label: "Purchased Ebooks",
+      href: "/dashboard/reader/purchaseEbook",
+    },
+    {
+      icon: Person,
+      label: "Profile Management",
+      href: "/dashboard/reader/purchaseEbook/bookmark/profile",
+    },
+    {
+      icon: Bookmark,
+      label: "Bookmark Page",
+      href: "/dashboard/reader/purchaseEbook/bookmark",
+    },
   ];
 
   // writer nav items
@@ -44,10 +62,22 @@ export async function LayoutContent() {
 
   // admin nav items
   const adminNavItems = [
-    { icon: Bookmark, label: "Home", href: "#" },
-    { icon: ClockArrowRotateLeft, label: "Manage Users", href: "#" },
-    { icon: BookOpen, label: "Manage All Ebooks", href: "#" },
-    { icon: Person, label: "View All Transactions", href: "#" },
+    { icon: House, label: "Home", href: "/dashboard/admin" },
+    {
+      icon: Person,
+      label: "Manage Users",
+      href: "/dashboard/admin/transaction/users",
+    },
+    {
+      icon: BookOpen,
+      label: "Manage All Ebooks",
+      href: "/dashboard/admin/transaction/users/ebook",
+    },
+    {
+      icon: CreditCard,
+      label: "View All Transactions",
+      href: "/dashboard/admin/transaction",
+    },
   ];
 
   // selected dashboard content
@@ -61,7 +91,7 @@ export async function LayoutContent() {
   //   nav links
   const layoutNavLinks = (
     <nav className="flex flex-col gap-1">
-      {navItems.map((item) => (
+      {navItems?.map((item) => (
         <Link
           href={item.href}
           key={item.label}
