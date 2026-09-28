@@ -1,10 +1,10 @@
-import React from "react";
+import WriterAddEbookForm from "@/components/writer/WriterAddEbookForm";
 
 const WriterAddEbookPage = () => {
   return (
-    <div>
-      <h2>add ebook page</h2>
-    </div>
+    <main className="max-w-3xl mx-auto py-10 px-4">
+      <WriterAddEbookForm />
+    </main>
   );
 };
 
