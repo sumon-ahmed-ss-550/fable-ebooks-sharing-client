@@ -9,6 +9,13 @@ export const getEbooksByWriterId = async (writerId) => {
   );
 };
 
+// get writer sales
+export const getWriterSales = async (writerId) => {
+  return await makeRequest(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/writer/sales?writerId=${writerId}`,
+  );
+};
+
 // get one ebook by id
 export const getOneEbook = async (id) => {
   return await makeRequest(

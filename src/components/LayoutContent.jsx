@@ -7,11 +7,9 @@ import {
   ClockArrowRotateLeft,
   CreditCard,
   House,
-  Pencil,
   Person,
 } from "@gravity-ui/icons";
 import { Button, Drawer } from "@heroui/react";
-import { hr } from "motion/react-client";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { LuBookPlus } from "react-icons/lu";
@@ -55,9 +53,8 @@ export async function LayoutContent() {
       label: "Add Ebook",
       href: "/dashboard/writer/edit_ebook/add_ebook",
     },
-    // { icon: Pencil, label: "Edit Ebook", href: "#" },
-    { icon: Bookmark, label: "Bookmark Page", href: "#" },
-    { icon: ChartBar, label: "Sales History", href: "#" },
+    { icon: Bookmark, label: "Bookmark Page", href: "/dashboard/writer/bookmarks" },
+    { icon: ChartBar, label: "Sales History", href: "/dashboard/writer/sales" },
   ];
 
   // admin nav items

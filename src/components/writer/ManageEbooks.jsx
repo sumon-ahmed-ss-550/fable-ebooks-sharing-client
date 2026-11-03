@@ -8,12 +8,15 @@ import {
   Eye,
   EyeSlash,
   Plus,
+  ShieldCheck,
+  BookOpen,
 } from "@gravity-ui/icons";
 import {
   changePublishedAndUnpublishedStatus,
   deleteEbook,
 } from "@/lib/action/action";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import WriterAddEbookForm from "./WriterAddEbookForm";
 import { PaginationWithSummary } from "../Pagination";
 
@@ -27,7 +30,7 @@ const EditEbookModal = ({ book, router }) => {
         variant="flat"
         isIconOnly
         aria-label={`Edit ${book.title}`}
-        className="text-zinc-300 bg-zinc-800 hover:bg-zinc-700"
+        className="text-zinc-300 bg-zinc-800 hover:bg-zinc-700 cursor-pointer"
       >
         <PencilToSquare className="w-4 h-4" />
       </Button>
@@ -48,10 +51,16 @@ const EditEbookModal = ({ book, router }) => {
   );
 };
 
-const ManageEbooks = ({ ebook }) => {
+const ManageEbooks = ({ ebook = [] }) => {
   const router = useRouter();
   const [deletingId, setDeletingId] = useState(null);
   const [deleteError, setDeleteError] = useState("");
+
+  const totalBooks = ebook?.length || 0;
+  const publishedCount =
+    ebook?.filter((b) => b.status === "published").length || 0;
+  const unpublishedCount =
+    ebook?.filter((b) => b.status === "unpublished").length || 0;
 
   // handle status toggler
   const handleToggleStatus = async (id, currentStatus) => {
@@ -87,6 +96,21 @@ const ManageEbooks = ({ ebook }) => {
       {/* Top Header Card */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#18181b] p-6 rounded-2xl border border-zinc-800 shadow-md">
         <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="p-1 rounded bg-amber-400/10 text-amber-400 border border-amber-400/20 text-[10px] font-bold uppercase tracking-wider">
+              Writer Studio
+            </span>
+            <Chip
+              size="sm"
+              variant="flat"
+              className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold text-[10px]"
+            >
+              <span className="flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3" />
+                Verified Writer
+              </span>
+            </Chip>
+          </div>
           <h1 className="text-2xl font-bold font-serif text-white">
             Manage Ebooks
           </h1>
@@ -94,14 +118,59 @@ const ManageEbooks = ({ ebook }) => {
             View, edit, or toggle publication state of your authored ebooks.
           </p>
         </div>
-        <Button
-          color="warning"
-          startContent={<Plus className="w-4 h-4" />}
-          className="font-semibold text-slate-950 bg-amber-400 hover:bg-amber-500 shadow-sm self-start sm:self-auto"
-        >
-          Create Ebook
-        </Button>
+
+        <div className="flex items-center gap-2">
+          <Link href="/dashboard/writer/edit_ebook/add_ebook">
+            <Button
+              color="warning"
+              startContent={<Plus className="w-4 h-4" />}
+              className="font-semibold text-slate-950 bg-amber-400 hover:bg-amber-500 shadow-sm cursor-pointer"
+            >
+              Create Ebook
+            </Button>
+          </Link>
+        </div>
       </div>
+
+      {/* Writer Overview Metrics */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-5 rounded-2xl bg-[#18181b] border border-zinc-800">
+          <span className="text-xs text-zinc-400 uppercase tracking-wider block font-semibold">
+            Total Ebooks
+          </span>
+          <span className="text-2xl font-black text-white font-mono mt-1 block">
+            {totalBooks}
+          </span>
+          <span className="text-[11px] text-zinc-500 mt-0.5 block">
+            Authored literature
+          </span>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-[#18181b] border border-zinc-800">
+          <span className="text-xs text-emerald-400 uppercase tracking-wider block font-semibold">
+            Published Live
+          </span>
+          <span className="text-2xl font-black text-emerald-400 font-mono mt-1 block">
+            {publishedCount}
+          </span>
+          <span className="text-[11px] text-zinc-500 mt-0.5 block">
+            Available on Browse page
+          </span>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-[#18181b] border border-zinc-800">
+          <span className="text-xs text-amber-400 uppercase tracking-wider block font-semibold">
+            Drafts / Unpublished
+          </span>
+          <span className="text-2xl font-black text-amber-400 font-mono mt-1 block">
+            {unpublishedCount}
+          </span>
+          <span className="text-[11px] text-zinc-500 mt-0.5 block">
+            Private drafts
+          </span>
+        </div>
+      </div>
+
       {deleteError && (
         <p role="alert" className="text-sm text-rose-400">
           {deleteError}
@@ -136,9 +205,20 @@ const ManageEbooks = ({ ebook }) => {
                   <Table.Row>
                     <Table.Cell
                       colSpan={4}
-                      className="text-center py-8 text-zinc-500"
+                      className="text-center py-10 text-zinc-500"
                     >
-                      No ebooks found. Click Create Ebook to get started.
+                      <div className="space-y-3">
+                        <p>No ebooks found. Click Create Ebook to get started.</p>
+                        <Link href="/dashboard/writer/edit_ebook/add_ebook">
+                          <Button
+                            size="sm"
+                            color="warning"
+                            className="bg-amber-400 text-slate-950 font-bold"
+                          >
+                            Add Your First Ebook
+                          </Button>
+                        </Link>
+                      </div>
                     </Table.Cell>
                   </Table.Row>
                 ) : (
@@ -149,14 +229,19 @@ const ManageEbooks = ({ ebook }) => {
                     >
                       {/* Title */}
                       <Table.Cell className="font-medium text-zinc-100">
-                        {book.title}
+                        <div>
+                          <span className="font-bold block text-sm">{book.title}</span>
+                          <span className="text-xs text-zinc-500">
+                            Genre: {book.genre || "Fiction"}
+                          </span>
+                        </div>
                       </Table.Cell>
 
                       {/* Price */}
-                      <Table.Cell className="text-zinc-300 font-mono">
+                      <Table.Cell className="text-amber-400 font-mono font-bold">
                         {book.price === 0
                           ? "Free"
-                          : `$${book.price.toFixed(2)}`}
+                          : `$${Number(book.price).toFixed(2)}`}
                       </Table.Cell>
 
                       {/* Status */}
@@ -185,6 +270,15 @@ const ManageEbooks = ({ ebook }) => {
                       {/* Actions */}
                       <Table.Cell>
                         <div className="flex items-center justify-end gap-2">
+                          {/* Preview in public */}
+                          <Link
+                            href={`/browse/${encodeURIComponent(book._id)}`}
+                            className="p-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 transition"
+                            title="Public Preview"
+                          >
+                            <BookOpen className="w-4 h-4" />
+                          </Link>
+
                           {/* status toggler button */}
                           <Button
                             size="sm"
@@ -204,11 +298,11 @@ const ManageEbooks = ({ ebook }) => {
                                 <Eye className="w-3.5 h-3.5" />
                               )
                             }
-                            className={
+                            className={`cursor-pointer ${
                               book.status === "published"
                                 ? "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
                                 : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                            }
+                            }`}
                           >
                             {book.status === "published"
                               ? "Unpublish"
@@ -228,7 +322,7 @@ const ManageEbooks = ({ ebook }) => {
                             onPress={() => handleDelete(book._id)}
                             isLoading={deletingId === book._id}
                             isDisabled={deletingId !== null}
-                            className="bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
+                            className="bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 cursor-pointer"
                           >
                             <TrashBin className="w-4 h-4" />
                           </Button>
