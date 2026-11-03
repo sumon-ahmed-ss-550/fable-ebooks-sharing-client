@@ -9,20 +9,30 @@ import {
   CircleExclamation,
 } from "@gravity-ui/icons";
 import Image from "next/image";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { updateEbook, writerInsertEbook } from "@/lib/action/action";
 
-const WriterAddEbookForm = () => {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    price: "",
-    genre: "",
-  });
+const WriterAddEbookForm = ({ ebook = null, onSuccess }) => {
+  const isEditing = Boolean(ebook);
+  // user session
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+  const router = useRouter();
+
+  const [formData, setFormData] = useState(() => ({
+    title: ebook?.title ?? "",
+    description: ebook?.description ?? "",
+    price: ebook?.price == null ? "" : String(ebook.price),
+    genre: ebook?.genre ?? "",
+  }));
 
   const [coverImage, setCoverImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreview, setImagePreview] = useState(ebook?.coverImage ?? null);
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState({ type: "", text: "" });
 
+  // handle change function
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -31,6 +41,7 @@ const WriterAddEbookForm = () => {
     }));
   };
 
+  // handle image change function
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -39,6 +50,7 @@ const WriterAddEbookForm = () => {
     }
   };
 
+  // upload imageBB function
   const uploadToImgBB = async (imageFile) => {
     const bodyData = new FormData();
     bodyData.append("image", imageFile);
@@ -59,17 +71,20 @@ const WriterAddEbookForm = () => {
     }
   };
 
+  // handle submit function
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setStatusMessage({ type: "", text: "" });
 
     try {
-      if (!coverImage) {
+      const coverImageUrl = coverImage
+        ? await uploadToImgBB(coverImage)
+        : ebook?.coverImage;
+
+      if (!coverImageUrl) {
         throw new Error("Please select a cover image for the Ebook.");
       }
-
-      const coverImageUrl = await uploadToImgBB(coverImage);
 
       const ebookPayload = {
         title: formData.title,
@@ -77,16 +92,30 @@ const WriterAddEbookForm = () => {
         price: Number(formData.price),
         genre: formData.genre,
         coverImage: coverImageUrl,
+        writerId: user?.id,
       };
+
+      if (isEditing) {
+        await updateEbook(ebook._id, ebookPayload);
+      } else {
+        await writerInsertEbook(ebookPayload);
+      }
 
       setStatusMessage({
         type: "success",
-        text: "Ebook added successfully!",
+        text: isEditing
+          ? "Ebook updated successfully!"
+          : "Ebook added successfully!",
       });
 
-      setFormData({ title: "", description: "", price: "", genre: "" });
-      setCoverImage(null);
-      setImagePreview(null);
+      if (isEditing) {
+        router.refresh();
+        onSuccess?.();
+      } else {
+        setFormData({ title: "", description: "", price: "", genre: "" });
+        setCoverImage(null);
+        setImagePreview(null);
+      }
     } catch (err) {
       setStatusMessage({
         type: "error",
@@ -105,10 +134,12 @@ const WriterAddEbookForm = () => {
         </div>
         <div>
           <Card.Title className="text-xl font-bold text-foreground">
-            Add New Ebook
+            {isEditing ? "Edit Ebook" : "Add New Ebook"}
           </Card.Title>
           <Card.Description className="text-small text-default-500">
-            Fill in the details below to publish a new book on Fable.
+            {isEditing
+              ? "Update your ebook details below."
+              : "Fill in the details below to publish a new book on Fable."}
           </Card.Description>
         </div>
       </Card.Header>
@@ -193,7 +224,8 @@ const WriterAddEbookForm = () => {
           {/* Cover Image Upload */}
           <div className="w-full flex flex-col gap-2">
             <label className="text-small font-medium text-foreground">
-              Cover Image Upload <span className="text-danger">*</span>
+              Cover Image Upload{" "}
+              {!isEditing && <span className="text-danger">*</span>}
             </label>
 
             <div className="w-full flex flex-col sm:flex-row items-center gap-4">
@@ -208,6 +240,7 @@ const WriterAddEbookForm = () => {
                 <input
                   type="file"
                   accept="image/*"
+                  required={!isEditing && !imagePreview}
                   onChange={handleImageChange}
                   className="hidden"
                 />
@@ -219,8 +252,9 @@ const WriterAddEbookForm = () => {
                     width={128}
                     height={176}
                     loading="eager"
+                    unoptimized
                     src={imagePreview}
-                    alt="Cover Preview"
+                    alt={`${formData.title || "Ebook"} cover preview`}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -236,7 +270,13 @@ const WriterAddEbookForm = () => {
             isLoading={loading}
             className="w-full mt-2 font-semibold"
           >
-            {loading ? "Uploading & Saving..." : "Publish Ebook"}
+            {loading
+              ? isEditing
+                ? "Saving Changes..."
+                : "Uploading & Saving..."
+              : isEditing
+                ? "Save Changes"
+                : "Publish Ebook"}
           </Button>
         </Form>
       </Card.Content>

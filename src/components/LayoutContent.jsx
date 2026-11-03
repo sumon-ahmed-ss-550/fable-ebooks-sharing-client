@@ -55,7 +55,7 @@ export async function LayoutContent() {
       label: "Add Ebook",
       href: "/dashboard/writer/edit_ebook/add_ebook",
     },
-    { icon: Pencil, label: "Edit Ebook", href: "/dashboard/writer/edit_ebook" },
+    // { icon: Pencil, label: "Edit Ebook", href: "#" },
     { icon: Bookmark, label: "Bookmark Page", href: "#" },
     { icon: ChartBar, label: "Sales History", href: "#" },
   ];

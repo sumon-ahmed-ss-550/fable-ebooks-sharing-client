@@ -12,6 +12,7 @@ export const getAuthorization = async (role) => {
     return redirect("/signIn");
   }
 
+  // redirect unauthorized page
   if (user?.role !== role) {
     return redirect("/unauthorized");
   }
