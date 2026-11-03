@@ -12,10 +12,10 @@ import {
   EyeSlash,
   ArrowRight,
   Sparkles,
+  CircleExclamation,
 } from "@gravity-ui/icons";
 import { FcGoogle } from "react-icons/fc";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -23,40 +23,54 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage("");
 
-    // signIn information
-    const { data, error } = await authClient.signIn.email({
-      email,
-      password,
-    });
-    const user = data?.user;
+    try {
+      // signIn information
+      const { data, error } = await authClient.signIn.email({
+        email,
+        password,
+      });
 
-    // selected redirect path with role
-    const selectedPath = {
-      reader: "/",
-      writer: "/dashboard/writer",
-      admin: "/dashboard/admin",
-    };
+      if (error) {
+        setErrorMessage(error.message || "Invalid email or password. Please try again.");
+        setIsLoading(false);
+        return;
+      }
 
-    // redirect role base
-    if (data) {
-      router.push(selectedPath[user?.role]);
+      const user = data?.user;
+
+      // selected redirect path with role
+      const selectedPath = {
+        reader: "/",
+        writer: "/dashboard/writer",
+        admin: "/dashboard/admin",
+      };
+
+      const targetPath = selectedPath[user?.role] || "/";
+      window.location.href = targetPath;
+    } catch (err) {
+      setErrorMessage(err.message || "An unexpected error occurred during sign in.");
+      setIsLoading(false);
     }
-
-    // Submit logic here
-    setTimeout(() => setIsLoading(false), 1500);
   };
 
   // handle signIn with google
   const handleGoogleSignIn = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-    });
+    setIsLoading(true);
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+      });
+    } catch (err) {
+      setErrorMessage("Failed to initiate Google sign in.");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -99,13 +113,25 @@ export default function SignInPage() {
 
           {/* Content */}
           <Card.Content className="space-y-6 pt-4 w-full">
+            {/* Error Message */}
+            {errorMessage && (
+              <div className="p-3 text-xs flex items-center gap-2 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/60 text-red-600 dark:text-red-400">
+                <CircleExclamation
+                  width={16}
+                  height={16}
+                  className="shrink-0"
+                />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
             {/* Social Sign In */}
             <Button
               type="button"
               variant="bordered"
               size="lg"
               onClick={handleGoogleSignIn}
-              className="w-full font-medium border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+              className="w-full font-medium border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               <FcGoogle width={18} height={18} />
               <span>Continue with Google</span>
@@ -159,7 +185,7 @@ export default function SignInPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 focus:outline-none text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors z-10"
+                    className="absolute right-3.5 focus:outline-none text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors z-10 cursor-pointer"
                   >
                     {showPassword ? (
                       <EyeSlash width={18} height={18} />
@@ -197,7 +223,7 @@ export default function SignInPage() {
                 variant="solid"
                 size="lg"
                 isLoading={isLoading}
-                className="w-full mt-2 font-semibold bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2"
+                className="w-full mt-2 font-semibold bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Sign In</span>
                 {!isLoading && <ArrowRight width={18} height={18} />}

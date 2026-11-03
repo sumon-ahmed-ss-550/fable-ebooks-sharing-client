@@ -22,3 +22,4 @@ const WriterBookmarksPage = async () => {
 };
 
 export default WriterBookmarksPage;
+

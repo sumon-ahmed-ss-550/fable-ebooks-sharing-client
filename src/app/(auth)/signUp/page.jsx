@@ -71,14 +71,24 @@ export default function SignUpPage() {
         role: selectedRole,
         agreeToTerms,
       });
-      await authClient.signOut();
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      // Registration complete state (No JWT token storage, no redirection)
+      if (error) {
+        setErrorMessage(
+          error.message || "Failed to create account. Please check your information or sign in.",
+        );
+        setIsLoading(false);
+        setStep(1);
+        return;
+      }
+
       setIsSubmitted(true);
+      setTimeout(() => {
+        const dest = selectedRole === "writer" ? "/dashboard/writer" : "/";
+        window.location.href = dest;
+      }, 2000);
     } catch (err) {
       setErrorMessage(
-        "Email is already registered. Please try another or sign in.",
+        err.message || "Email is already registered. Please try another or sign in.",
       );
       setStep(1);
     } finally {
@@ -93,12 +103,8 @@ export default function SignUpPage() {
       await authClient.signIn.social({
         provider: "google",
       });
-
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-      setIsSubmitted(true);
     } catch (err) {
       setErrorMessage("Failed to authenticate with Google.");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -146,7 +152,7 @@ export default function SignUpPage() {
 
             <Card.Description className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
               {isSubmitted
-                ? "Your account has been successfully set up."
+                ? "Your account has been set up! Redirecting to your workspace..."
                 : step === 1
                   ? "Join Fable to read, write, and explore thousands of stories."
                   : "Select how you'd like to use Fable. You can customize this later."}
@@ -169,24 +175,40 @@ export default function SignUpPage() {
 
             <AnimatePresence mode="wait">
               {isSubmitted ? (
-                /* SUCCESS STATE (No redirect) */
+                /* SUCCESS STATE */
                 <motion.div
                   key="submitted"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.2 }}
-                  className="text-center py-6 space-y-4 w-full"
+                  className="text-center py-6 space-y-5 w-full"
                 >
                   <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto">
                     <Check width={32} height={32} />
                   </div>
-                  <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Thank you for signing up as a{" "}
-                    <strong className="capitalize text-indigo-600 dark:text-indigo-400">
-                      {selectedRole}
-                    </strong>
-                    !
-                  </p>
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                      Welcome to Fable!
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                      You are signed in as a{" "}
+                      <strong className="capitalize text-indigo-600 dark:text-indigo-400">
+                        {selectedRole}
+                      </strong>
+                      . Redirecting in a moment...
+                    </p>
+                  </div>
+                  <Button
+                    color="primary"
+                    variant="solid"
+                    onPress={() => {
+                      window.location.href =
+                        selectedRole === "writer" ? "/dashboard/writer" : "/";
+                    }}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold cursor-pointer"
+                  >
+                    Proceed to {selectedRole === "writer" ? "Writer Studio" : "Home"} →
+                  </Button>
                 </motion.div>
               ) : step === 1 ? (
                 /* STEP 1: Registration Credentials Form */
@@ -205,7 +227,7 @@ export default function SignUpPage() {
                     size="lg"
                     onClick={handleGoogleSignUp}
                     isLoading={isLoading}
-                    className="w-full font-medium border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+                    className="w-full font-medium border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {!isLoading && <FcGoogle width={18} height={18} />}
                     <span>Sign up with Google</span>
@@ -273,7 +295,7 @@ export default function SignUpPage() {
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3.5 focus:outline-none text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors z-10"
+                          className="absolute right-3.5 focus:outline-none text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors z-10 cursor-pointer"
                         >
                           {showPassword ? (
                             <EyeSlash width={18} height={18} />
@@ -305,7 +327,7 @@ export default function SignUpPage() {
                           onClick={() =>
                             setShowConfirmPassword(!showConfirmPassword)
                           }
-                          className="absolute right-3.5 focus:outline-none text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors z-10"
+                          className="absolute right-3.5 focus:outline-none text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors z-10 cursor-pointer"
                         >
                           {showConfirmPassword ? (
                             <EyeSlash width={18} height={18} />
@@ -316,7 +338,7 @@ export default function SignUpPage() {
                       </div>
                     </div>
 
-                    {/* HeroUI Checkbox */}
+                    {/* Checkbox */}
                     <div className="pt-2">
                       <Checkbox
                         isSelected={agreeToTerms}
@@ -358,7 +380,7 @@ export default function SignUpPage() {
                       color="primary"
                       variant="solid"
                       size="lg"
-                      className="w-full mt-2 font-semibold bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2"
+                      className="w-full mt-2 font-semibold bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <span>Continue to Role Selection</span>
                       <ArrowRight width={18} height={18} />
@@ -380,7 +402,7 @@ export default function SignUpPage() {
                     <button
                       type="button"
                       onClick={() => setSelectedRole("reader")}
-                      className={`p-4 rounded-2xl border text-left transition-all relative flex items-start gap-3.5 ${
+                      className={`p-4 rounded-2xl border text-left transition-all relative flex items-start gap-3.5 cursor-pointer ${
                         selectedRole === "reader"
                           ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/40 ring-2 ring-indigo-600/20"
                           : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700"
@@ -411,7 +433,7 @@ export default function SignUpPage() {
                     <button
                       type="button"
                       onClick={() => setSelectedRole("writer")}
-                      className={`p-4 rounded-2xl border text-left transition-all relative flex items-start gap-3.5 ${
+                      className={`p-4 rounded-2xl border text-left transition-all relative flex items-start gap-3.5 cursor-pointer ${
                         selectedRole === "writer"
                           ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/40 ring-2 ring-indigo-600/20"
                           : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700"
@@ -447,7 +469,7 @@ export default function SignUpPage() {
                       size="lg"
                       onClick={() => setStep(1)}
                       disabled={isLoading}
-                      className="w-1/3 font-medium border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
+                      className="w-1/3 font-medium border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 cursor-pointer"
                     >
                       Back
                     </Button>
@@ -458,7 +480,7 @@ export default function SignUpPage() {
                       size="lg"
                       isLoading={isLoading}
                       onClick={handleCompleteRegistration}
-                      className="w-2/3 font-semibold bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2"
+                      className="w-2/3 font-semibold bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <span>Complete Setup</span>
                       {!isLoading && <ArrowRight width={18} height={18} />}
