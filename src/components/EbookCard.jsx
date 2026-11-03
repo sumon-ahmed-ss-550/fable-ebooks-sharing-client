@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 
-export default function EbookCard() {
+export default function EbookCard({ books = [] }) {
   const [selectedBook, setSelectedBook] = useState(null);
 
-  // Hard-coded mock data inside the component
-  const ebooks = [
+  // Fallback mock data
+  const mockEbooks = [
     {
-      id: 1,
+      id: "1",
       title: "The Silent Ocean",
       author: "John Carter",
       genre: "Mystery",
@@ -25,7 +26,7 @@ export default function EbookCard() {
       published: "2024",
     },
     {
-      id: 2,
+      id: "2",
       title: "Echoes of Eternity",
       author: "Sarah Williams",
       genre: "Sci-Fi",
@@ -40,7 +41,7 @@ export default function EbookCard() {
       published: "2023",
     },
     {
-      id: 3,
+      id: "3",
       title: "Whispers in the Mist",
       author: "Michael Brown",
       genre: "Fantasy",
@@ -55,7 +56,7 @@ export default function EbookCard() {
       published: "2024",
     },
     {
-      id: 4,
+      id: "4",
       title: "Letters to Yesterday",
       author: "Elena Rostova",
       genre: "Romance",
@@ -70,7 +71,7 @@ export default function EbookCard() {
       published: "2023",
     },
     {
-      id: 5,
+      id: "5",
       title: "The Quantum Paradox",
       author: "Marcus Vance",
       genre: "Sci-Fi",
@@ -85,7 +86,7 @@ export default function EbookCard() {
       published: "2024",
     },
     {
-      id: 6,
+      id: "6",
       title: "Shadows Over Venice",
       author: "John Carter",
       genre: "Thriller",
@@ -101,6 +102,23 @@ export default function EbookCard() {
     },
   ];
 
+  const ebooks = Array.isArray(books) && books.length > 0
+    ? books.slice(0, 6).map((b) => ({
+        id: b._id,
+        title: b.title,
+        author: b.author || "Fable Author",
+        genre: b.genre || "Featured",
+        rating: 4.9,
+        reviews: 88,
+        cover: b.coverImage,
+        price: `$${Number(b.price || 0).toFixed(2)}`,
+        description: b.description,
+        pages: 320,
+        published: b.createdAt ? new Date(b.createdAt).getFullYear() : "2024",
+        isRealBook: true,
+      }))
+    : mockEbooks;
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Section Header */}
@@ -113,12 +131,12 @@ export default function EbookCard() {
             Handpicked titles carefully selected for you this week
           </p>
         </div>
-        <a
+        <Link
           href="/browse"
           className="text-xs font-bold text-amber-400 hover:text-amber-300 hover:underline mt-2 sm:mt-0 transition-colors"
         >
           Explore All →
-        </a>
+        </Link>
       </div>
 
       {/* Staggered Grid Container */}
@@ -167,7 +185,7 @@ export default function EbookCard() {
               </span>
 
               {/* Price Badge */}
-              <span className="absolute bottom-3 right-3 px-3 py-1 bg-amber-500 text-slate-950 text-sm font-extrabold rounded-lg shadow-md">
+              <span className="absolute bottom-3 right-3 px-3 py-1 bg-amber-500 text-slate-950 text-sm font-extrabold rounded-lg shadow-md font-mono">
                 {book.price}
               </span>
             </div>
@@ -195,7 +213,7 @@ export default function EbookCard() {
                 </p>
               </div>
 
-              {/* Action Button */}
+              {/* Action Buttons */}
               <div className="pt-3 border-t border-slate-800/60 flex items-center justify-between gap-2">
                 <button
                   onClick={() => setSelectedBook(book)}
@@ -231,7 +249,7 @@ export default function EbookCard() {
                   height={168}
                   src={selectedBook.cover}
                   alt={selectedBook.title}
-                  className="w-28 h-40 object-cover rounded-xl border border-slate-800 shadow"
+                  className="w-28 h-40 object-cover rounded-xl border border-slate-800 shadow shrink-0"
                 />
                 <div className="flex-1">
                   <span className="text-xs text-amber-400 font-semibold">
@@ -243,19 +261,31 @@ export default function EbookCard() {
                   <p className="text-sm text-slate-400 mb-2">
                     by {selectedBook.author}
                   </p>
-                  <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                  <p className="text-xs text-slate-300 leading-relaxed mb-4 line-clamp-3">
                     {selectedBook.description}
                   </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-amber-400">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-lg font-bold text-amber-400 font-mono">
                       {selectedBook.price}
                     </span>
-                    <button
-                      onClick={() => setSelectedBook(null)}
-                      className="px-4 py-2 bg-amber-500 text-slate-950 font-bold text-xs rounded-lg hover:bg-amber-400 cursor-pointer"
-                    >
-                      Close Preview
-                    </button>
+                    <div className="flex gap-2">
+                      <Link
+                        href={
+                          selectedBook.isRealBook
+                            ? `/browse/${encodeURIComponent(selectedBook.id)}`
+                            : "/browse"
+                        }
+                        className="px-3 py-2 bg-amber-400 text-slate-950 font-bold text-xs rounded-lg hover:bg-amber-300 transition"
+                      >
+                        View Full Details →
+                      </Link>
+                      <button
+                        onClick={() => setSelectedBook(null)}
+                        className="px-3 py-2 bg-slate-800 text-slate-300 font-bold text-xs rounded-lg hover:bg-slate-700 cursor-pointer"
+                      >
+                        Close
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

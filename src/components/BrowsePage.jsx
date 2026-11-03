@@ -1,58 +1,89 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
+import { readerToggleBookmark } from "@/lib/action/action";
+import { getReaderBookmarkIds } from "@/lib/queries/queries";
 
-const Browse = ({ ebooks }) => {
+const Browse = ({ ebooks = [] }) => {
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+
   const [bookmarks, setBookmarks] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [sortOrder, setSortOrder] = useState("title-asc");
 
-  const toggleBookmark = (id) => {
-    setBookmarks((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
   const availableEbooks = Array.isArray(ebooks) ? ebooks : [];
   const genres = [
     ...new Set(availableEbooks.map((ebook) => ebook.genre).filter(Boolean)),
   ].sort((first, second) => first.localeCompare(second));
 
-  // const normalizedQuery = searchQuery.trim().toLocaleLowerCase();
+  // Load existing bookmarks for logged in user
+  useEffect(() => {
+    if (!user?.id) return;
+    getReaderBookmarkIds(user.id)
+      .then((ids) => {
+        if (Array.isArray(ids)) {
+          const map = {};
+          ids.forEach((id) => {
+            map[id] = true;
+          });
+          setBookmarks(map);
+        }
+      })
+      .catch((err) => console.error("Error fetching bookmarks:", err));
+  }, [user?.id]);
 
-  // const filteredEbooks = availableEbooks
-  //   .filter((ebook) => {
-  //     const matchesQuery = [
-  //       ebook.title,
-  //       ebook.description,
-  //       ebook.genre,
-  //       ebook.author,
-  //     ]
-  //       .filter(Boolean)
-  //       .some((value) => value.toLocaleLowerCase().includes(normalizedQuery));
+  const toggleBookmark = async (id) => {
+    // optimistic update
+    setBookmarks((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
 
-  //     const matchesGenre = !selectedGenre || ebook.genre === selectedGenre;
-  //     const matchesPrice =
-  //       maxPrice === "" ||
-  //       (Number.isFinite(Number(ebook.price)) &&
-  //         Number(ebook.price) <= Number(maxPrice));
+    if (user?.id) {
+      try {
+        await readerToggleBookmark(user.id, id);
+      } catch (err) {
+        console.error("Bookmark toggle failed:", err);
+      }
+    }
+  };
 
-  //     return matchesQuery && matchesGenre && matchesPrice;
-  //   })
-  //   .sort((first, second) => {
-  //     if (sortOrder === "price-asc") {
-  //       return Number(first.price) - Number(second.price);
-  //     }
-  //     if (sortOrder === "price-desc") {
-  //       return Number(second.price) - Number(first.price);
-  //     }
-  //     return (first.title || "").localeCompare(second.title || "");
-  //   });
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+
+  const filteredEbooks = availableEbooks
+    .filter((ebook) => {
+      const matchesQuery = [
+        ebook.title,
+        ebook.description,
+        ebook.genre,
+        ebook.author,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(normalizedQuery));
+
+      const matchesGenre = !selectedGenre || ebook.genre === selectedGenre;
+      const matchesPrice =
+        maxPrice === "" ||
+        (Number.isFinite(Number(ebook.price)) &&
+          Number(ebook.price) <= Number(maxPrice));
+
+      return matchesQuery && matchesGenre && matchesPrice;
+    })
+    .sort((first, second) => {
+      if (sortOrder === "price-asc") {
+        return Number(first.price || 0) - Number(second.price || 0);
+      }
+      if (sortOrder === "price-desc") {
+        return Number(second.price || 0) - Number(first.price || 0);
+      }
+      return (first.title || "").localeCompare(second.title || "");
+    });
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -62,7 +93,7 @@ const Browse = ({ ebooks }) => {
   };
 
   return (
-    <section className="bg-slate-950 text-slate-100">
+    <section className="bg-slate-950 text-slate-100 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="mb-9">
           <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-amber-400">
@@ -145,9 +176,9 @@ const Browse = ({ ebooks }) => {
             <p className="text-sm text-slate-400" aria-live="polite">
               Showing{" "}
               <span className="font-semibold text-slate-200">
-                {availableEbooks.length}
+                {filteredEbooks.length}
               </span>{" "}
-              {availableEbooks.length === 1 ? "book" : "books"}
+              {filteredEbooks.length === 1 ? "book" : "books"}
             </p>
             {(searchQuery ||
               selectedGenre ||
@@ -156,7 +187,7 @@ const Browse = ({ ebooks }) => {
               <button
                 type="button"
                 onClick={clearFilters}
-                className="text-sm font-semibold text-amber-400 transition hover:text-amber-300 focus-visible:outline-none focus-visible:underline"
+                className="text-sm font-semibold text-amber-400 transition hover:text-amber-300 focus-visible:outline-none focus-visible:underline cursor-pointer"
               >
                 Clear filters
               </button>
@@ -166,8 +197,8 @@ const Browse = ({ ebooks }) => {
 
         {/* ebooks card grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {availableEbooks.length > 0 ? (
-            availableEbooks.map((ebook) => {
+          {filteredEbooks.length > 0 ? (
+            filteredEbooks.map((ebook) => {
               const ebookId = ebook._id?.$oid || ebook._id;
               const isBookmarked = !!bookmarks[ebookId];
 
@@ -193,7 +224,7 @@ const Browse = ({ ebooks }) => {
                     <button
                       type="button"
                       onClick={() => toggleBookmark(ebookId)}
-                      className={`absolute right-3 top-3 z-10 rounded-full border p-2.5 shadow-md backdrop-blur-md transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
+                      className={`absolute right-3 top-3 z-10 rounded-full border p-2.5 shadow-md backdrop-blur-md transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 cursor-pointer ${
                         isBookmarked
                           ? "border-amber-300 bg-amber-400 text-slate-950 hover:bg-amber-300"
                           : "border-white/15 bg-slate-950/70 text-white hover:border-amber-300/50 hover:bg-slate-900 hover:text-amber-300"
@@ -237,7 +268,7 @@ const Browse = ({ ebooks }) => {
                           Price
                         </span>
                         <span className="text-lg font-extrabold text-amber-400">
-                          ${ebook.price}
+                          ${Number(ebook.price || 0).toFixed(2)}
                         </span>
                       </div>
 
