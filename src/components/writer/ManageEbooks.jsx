@@ -21,7 +21,7 @@ import { getWriterSales } from "@/lib/queries/queries";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import WriterAddEbookForm from "./WriterAddEbookForm";
-import { PaginationWithSummary } from "../Pagination";
+import SimplePagination from "../Pagination";
 
 const EditEbookModal = ({ book, router }) => {
   const modalState = useOverlayState();
@@ -60,12 +60,21 @@ const ManageEbooks = ({ ebook = [], user = null }) => {
   const [deleteError, setDeleteError] = useState("");
   const [salesData, setSalesData] = useState(null);
   const [loadingSales, setLoadingSales] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
+  const itemsPerPage = 12;
   const totalBooks = ebook?.length || 0;
+  const totalPages = Math.ceil(totalBooks / itemsPerPage);
+
   const publishedCount =
     ebook?.filter((b) => b.status === "published").length || 0;
   const unpublishedCount =
     ebook?.filter((b) => b.status === "unpublished").length || 0;
+
+  // Paginate ebooks
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedEbooks = ebook?.slice(startIndex, endIndex) || [];
 
   const isVerified = user?.writerVerificationStatus === "verified";
 
@@ -304,7 +313,7 @@ const ManageEbooks = ({ ebook = [], user = null }) => {
                     </Table.Cell>
                   </Table.Row>
                 ) : (
-                  ebook.map((book) => (
+                  paginatedEbooks.map((book) => (
                     <Table.Row
                       key={book._id}
                       className="border-b border-zinc-800/60 hover:bg-zinc-800/40 transition-colors"
@@ -425,9 +434,15 @@ const ManageEbooks = ({ ebook = [], user = null }) => {
       </div>
 
       {/* pagination with summary */}
-      <div className="mt-4">
-        <PaginationWithSummary />
-      </div>
+      {totalPages > 1 && (
+        <div className="mt-4 flex justify-center">
+          <SimplePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
     </div>
   );
 };
