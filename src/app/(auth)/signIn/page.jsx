@@ -16,6 +16,7 @@ import {
 } from "@gravity-ui/icons";
 import { FcGoogle } from "react-icons/fc";
 import { authClient } from "@/lib/auth-client";
+import { exchangeToken } from "@/lib/auth-backend";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -45,6 +46,9 @@ export default function SignInPage() {
 
       const user = data?.user;
 
+      // Exchange Better Auth session for JWT token
+      await exchangeToken(data);
+
       // selected redirect path with role
       const selectedPath = {
         reader: "/",
@@ -66,6 +70,7 @@ export default function SignInPage() {
     try {
       await authClient.signIn.social({
         provider: "google",
+        callbackURL: "/auth/callback",
       });
     } catch (err) {
       setErrorMessage("Failed to initiate Google sign in.");

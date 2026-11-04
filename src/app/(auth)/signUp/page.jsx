@@ -18,6 +18,7 @@ import {
 } from "@gravity-ui/icons";
 import { FcGoogle } from "react-icons/fc";
 import { authClient } from "@/lib/auth-client";
+import { exchangeToken } from "@/lib/auth-backend";
 
 export default function SignUpPage() {
   // Form State
@@ -81,6 +82,9 @@ export default function SignUpPage() {
         return;
       }
 
+      // Exchange Better Auth session for JWT token
+      await exchangeToken(data);
+
       setIsSubmitted(true);
       setTimeout(() => {
         const dest = selectedRole === "writer" ? "/dashboard/writer" : "/";
@@ -102,6 +106,7 @@ export default function SignUpPage() {
     try {
       await authClient.signIn.social({
         provider: "google",
+        callbackURL: "/auth/callback",
       });
     } catch (err) {
       setErrorMessage("Failed to authenticate with Google.");

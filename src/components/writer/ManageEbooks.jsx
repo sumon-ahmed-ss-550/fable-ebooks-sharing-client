@@ -10,7 +10,7 @@ import {
   Plus,
   ShieldCheck,
   BookOpen,
-  Chart,
+  ChartPie,
   CreditCard,
 } from "@gravity-ui/icons";
 import {
@@ -223,7 +223,7 @@ const ManageEbooks = ({ ebook = [], user = null }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="p-5 rounded-2xl bg-[#18181b] border border-zinc-800">
             <div className="flex items-center gap-2 mb-2">
-              <Chart className="w-5 h-5 text-emerald-400" />
+              <ChartPie className="w-5 h-5 text-emerald-400" />
               <span className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">
                 Total Sales
               </span>

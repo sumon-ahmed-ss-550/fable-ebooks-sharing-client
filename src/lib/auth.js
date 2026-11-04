@@ -36,4 +36,13 @@ export const auth = betterAuth({
       },
     },
   },
+
+  // callbacks
+  callbacks: {
+    async afterSignIn(user, session) {
+      // This will be called on the server after sign in
+      // We'll handle token exchange on the client side instead
+      return user;
+    },
+  },
 });

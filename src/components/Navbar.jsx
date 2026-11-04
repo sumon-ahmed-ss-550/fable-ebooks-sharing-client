@@ -15,6 +15,7 @@ import {
   ArrowRightFromSquare,
 } from "@gravity-ui/icons";
 import { authClient } from "@/lib/auth-client";
+import { exchangeToken, clearAuthData } from "@/lib/auth-backend";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -45,6 +46,9 @@ export default function Navbar() {
 
   // handle sign out function
   const handleSignOut = async () => {
+    // Clear JWT token from localStorage
+    clearAuthData();
+
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {

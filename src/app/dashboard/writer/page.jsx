@@ -1,20 +1,44 @@
-import ManageEbooks from "@/components/writer/ManageEbooks";
-import { auth } from "@/lib/auth";
-import { getEbooksByWriterId } from "@/lib/queries/queries";
-import { headers } from "next/headers";
+"use client";
 
-const WriterHomePage = async () => {
-  // user session
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+import { useState, useEffect } from "react";
+import ManageEbooks from "@/components/writer/ManageEbooks";
+import { authClient } from "@/lib/auth-client";
+import { getEbooksByWriterId } from "@/lib/queries/queries";
+
+const WriterHomePage = () => {
+  const { data: session } = authClient.useSession();
   const user = session?.user;
-  const ebook = await getEbooksByWriterId(user?.id);
+  const [ebook, setEbook] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEbooks = async () => {
+      if (user?.id) {
+        try {
+          const data = await getEbooksByWriterId(user.id);
+          setEbook(Array.isArray(data) ? data : []);
+        } catch (error) {
+          console.error("Failed to fetch ebooks:", error);
+          setEbook([]);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    fetchEbooks();
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen p-4 md:p-8 text-zinc-100">
       <div className="max-w-6xl mx-auto">
-        <ManageEbooks ebook={ebook} user={user} />
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+            <p className="mt-4 text-slate-400">Loading ebooks...</p>
+          </div>
+        ) : (
+          <ManageEbooks ebook={ebook} user={user} />
+        )}
       </div>
     </div>
   );
