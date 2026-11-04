@@ -23,10 +23,11 @@ export const getOneEbook = async (id) => {
   );
 };
 
-// get published ebooks
-export const getPublishedEbooks = async () => {
+// get published ebooks with pagination and filters
+export const getPublishedEbooks = async (params = {}) => {
+  const queryParams = new URLSearchParams(params).toString();
   return await makeRequest(
-    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/writer/book/published`,
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/ebook/published${queryParams ? `?${queryParams}` : ""}`,
   );
 };
 
@@ -94,5 +95,61 @@ export const getAdminTransactions = async () => {
 export const getAdminStats = async () => {
   return await makeRequest(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/stats`,
+  );
+};
+
+// --- PAYMENT QUERIES ---
+
+// create ebook checkout session
+export const createEbookCheckoutSession = async (userId, ebookId) => {
+  return await makeRequest(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/payment/create-checkout-session`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ userId, ebookId }),
+    }
+  );
+};
+
+// create writer verification checkout session
+export const createVerificationCheckoutSession = async (userId) => {
+  return await makeRequest(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/payment/create-verification-session`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ userId }),
+    }
+  );
+};
+
+// get session status
+export const getSessionStatus = async (sessionId) => {
+  return await makeRequest(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/payment/session/${sessionId}`,
+  );
+};
+
+// --- IMAGE QUERIES ---
+
+// upload image to ImgBB
+export const uploadImage = async (imageData) => {
+  return await makeRequest(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/image/upload`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ image: imageData }),
+    }
+  );
+};
+
+// --- EBOOK CONTENT QUERIES ---
+
+// get ebook content (protected)
+export const getEbookContent = async (ebookId, userId) => {
+  return await makeRequest(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/ebook/${ebookId}/content?userId=${userId}`,
   );
 };

@@ -110,7 +110,7 @@ export default function AdminUsersTable({ initialUsers = [] }) {
           <Table.ScrollContainer>
             <Table.Content aria-label="Admin Users Table">
               <Table.Header>
-                <Table.Column className="text-slate-400 font-semibold">User</Table.Column>
+                <Table.Column isRowHeader className="text-slate-400 font-semibold">User</Table.Column>
                 <Table.Column className="text-slate-400 font-semibold">Email</Table.Column>
                 <Table.Column className="text-slate-400 font-semibold">Role</Table.Column>
                 <Table.Column className="text-slate-400 font-semibold">Created At</Table.Column>
@@ -209,4 +209,3 @@ export default function AdminUsersTable({ initialUsers = [] }) {
     </div>
   );
 }
-

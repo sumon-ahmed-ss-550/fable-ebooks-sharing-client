@@ -71,7 +71,7 @@ export default function AdminTransactionsTable({ initialTransactions = [] }) {
           <Table.ScrollContainer>
             <Table.Content aria-label="Admin Transactions Table">
               <Table.Header>
-                <Table.Column className="text-slate-400 font-semibold">Transaction ID</Table.Column>
+                <Table.Column isRowHeader className="text-slate-400 font-semibold">Transaction ID</Table.Column>
                 <Table.Column className="text-slate-400 font-semibold">Buyer</Table.Column>
                 <Table.Column className="text-slate-400 font-semibold">Ebook Title</Table.Column>
                 <Table.Column className="text-slate-400 font-semibold">Amount</Table.Column>
@@ -152,4 +152,3 @@ export default function AdminTransactionsTable({ initialTransactions = [] }) {
     </div>
   );
 }
-

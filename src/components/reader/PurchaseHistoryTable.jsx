@@ -61,7 +61,7 @@ export default function PurchaseHistoryTable({ purchases = [] }) {
           <Table.ScrollContainer>
             <Table.Content aria-label="Purchase History Table">
               <Table.Header>
-                <Table.Column className="text-slate-400 font-semibold">
+                <Table.Column isRowHeader className="text-slate-400 font-semibold">
                   Ebook
                 </Table.Column>
                 <Table.Column className="text-slate-400 font-semibold">
@@ -192,4 +192,3 @@ export default function PurchaseHistoryTable({ purchases = [] }) {
     </div>
   );
 }
-

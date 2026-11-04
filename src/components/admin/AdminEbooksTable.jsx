@@ -103,7 +103,7 @@ export default function AdminEbooksTable({ initialEbooks = [] }) {
           <Table.ScrollContainer>
             <Table.Content aria-label="Admin All Ebooks Table">
               <Table.Header>
-                <Table.Column className="text-slate-400 font-semibold">Ebook</Table.Column>
+                <Table.Column isRowHeader className="text-slate-400 font-semibold">Ebook</Table.Column>
                 <Table.Column className="text-slate-400 font-semibold">Genre</Table.Column>
                 <Table.Column className="text-slate-400 font-semibold">Price</Table.Column>
                 <Table.Column className="text-slate-400 font-semibold">Status</Table.Column>
@@ -242,4 +242,3 @@ export default function AdminEbooksTable({ initialEbooks = [] }) {
     </div>
   );
 }
-

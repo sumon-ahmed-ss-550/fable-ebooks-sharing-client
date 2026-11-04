@@ -6,8 +6,9 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { readerToggleBookmark } from "@/lib/action/action";
 import { getReaderBookmarkIds } from "@/lib/queries/queries";
+import Pagination from "./Pagination";
 
-const Browse = ({ ebooks = [] }) => {
+const Browse = ({ ebooks = [], pagination = null }) => {
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
@@ -15,7 +16,7 @@ const Browse = ({ ebooks = [] }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [sortOrder, setSortOrder] = useState("title-asc");
+  const [sortOrder, setSortOrder] = useState("newest");
 
   const availableEbooks = Array.isArray(ebooks) ? ebooks : [];
   const genres = [
@@ -89,7 +90,8 @@ const Browse = ({ ebooks = [] }) => {
     setSearchQuery("");
     setSelectedGenre("");
     setMaxPrice("");
-    setSortOrder("title-asc");
+    setSortOrder("newest");
+    router.push("/browse");
   };
 
   return (
@@ -316,6 +318,25 @@ const Browse = ({ ebooks = [] }) => {
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {pagination && pagination.pages > 1 && (
+          <div className="mt-8 flex justify-center">
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.pages}
+              onPageChange={(page) => {
+                const params = new URLSearchParams();
+                if (searchQuery) params.set("search", searchQuery);
+                if (selectedGenre) params.set("genre", selectedGenre);
+                if (maxPrice) params.set("maxPrice", maxPrice);
+                if (sortOrder && sortOrder !== "newest") params.set("sort", sortOrder);
+                params.set("page", page);
+                window.location.href = `/browse?${params.toString()}`;
+              }}
+            />
+          </div>
+        )}
       </div>
     </section>
   );
