@@ -23,8 +23,15 @@ import Link from "next/link";
 import WriterAddEbookForm from "./WriterAddEbookForm";
 import SimplePagination from "../Pagination";
 
-const EditEbookModal = ({ book, router }) => {
+const EditEbookModal = ({ book, router, onUpdate }) => {
   const modalState = useOverlayState();
+
+  const handleSuccess = (updatedEbook) => {
+    if (onUpdate) {
+      onUpdate(updatedEbook);
+    }
+    modalState.close();
+  };
 
   return (
     <Modal state={modalState}>
@@ -45,7 +52,7 @@ const EditEbookModal = ({ book, router }) => {
               <h2 className="text-xl font-semibold">Edit Ebook</h2>
             </Modal.Header>
             <Modal.Body className="p-6">
-              <WriterAddEbookForm ebook={book} onSuccess={modalState.close} />
+              <WriterAddEbookForm ebook={book} onSuccess={handleSuccess} />
             </Modal.Body>
           </Modal.Dialog>
         </Modal.Container>
@@ -61,20 +68,26 @@ const ManageEbooks = ({ ebook = [], user = null }) => {
   const [salesData, setSalesData] = useState(null);
   const [loadingSales, setLoadingSales] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [localEbooks, setLocalEbooks] = useState(ebook);
 
   const itemsPerPage = 12;
-  const totalBooks = ebook?.length || 0;
+  const totalBooks = localEbooks?.length || 0;
   const totalPages = Math.ceil(totalBooks / itemsPerPage);
 
   const publishedCount =
-    ebook?.filter((b) => b.status === "published").length || 0;
+    localEbooks?.filter((b) => b.status === "published").length || 0;
   const unpublishedCount =
-    ebook?.filter((b) => b.status === "unpublished").length || 0;
+    localEbooks?.filter((b) => b.status === "unpublished").length || 0;
 
   // Paginate ebooks
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedEbooks = ebook?.slice(startIndex, endIndex) || [];
+  const paginatedEbooks = localEbooks?.slice(startIndex, endIndex) || [];
+
+  // Sync local ebooks with prop
+  useEffect(() => {
+    setLocalEbooks(ebook);
+  }, [ebook]);
 
   const isVerified = user?.writerVerificationStatus === "verified";
 
@@ -99,9 +112,24 @@ const ManageEbooks = ({ ebook = [], user = null }) => {
   const handleToggleStatus = async (id, currentStatus) => {
     const newStatus =
       currentStatus === "published" ? "unpublished" : "published";
-    const data = await changePublishedAndUnpublishedStatus(id, newStatus);
-    if (data) {
-      router.refresh();
+
+    // Optimistic update
+    setLocalEbooks((prev) =>
+      prev.map((book) =>
+        book._id === id ? { ...book, status: newStatus } : book
+      )
+    );
+
+    try {
+      await changePublishedAndUnpublishedStatus(id, newStatus);
+    } catch (error) {
+      // Revert on error
+      setLocalEbooks((prev) =>
+        prev.map((book) =>
+          book._id === id ? { ...book, status: currentStatus } : book
+        )
+      );
+      console.error("Failed to toggle status:", error);
     }
   };
 
@@ -114,10 +142,15 @@ const ManageEbooks = ({ ebook = [], user = null }) => {
     setDeletingId(id);
     setDeleteError("");
 
+    // Optimistic update
+    const previousEbooks = [...localEbooks];
+    setLocalEbooks((prev) => prev.filter((book) => book._id !== id));
+
     try {
       await deleteEbook(id);
-      router.refresh();
     } catch (error) {
+      // Revert on error
+      setLocalEbooks(previousEbooks);
       setDeleteError(error.message || "Could not delete the ebook.");
     } finally {
       setDeletingId(null);
@@ -401,7 +434,17 @@ const ManageEbooks = ({ ebook = [], user = null }) => {
                           </Button>
 
                           {/* edit modal */}
-                          <EditEbookModal book={book} router={router} />
+                          <EditEbookModal
+                            book={book}
+                            router={router}
+                            onUpdate={(updatedEbook) => {
+                              setLocalEbooks((prev) =>
+                                prev.map((b) =>
+                                  b._id === updatedEbook._id ? updatedEbook : b
+                                )
+                              );
+                            }}
+                          />
 
                           {/* delete button */}
                           <Button
