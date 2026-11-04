@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { readerToggleBookmark } from "@/lib/action/action";
 import { getReaderBookmarkIds } from "@/lib/queries/queries";
@@ -322,7 +323,7 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
                 </button>
               )}
             </div>
-          ))}
+          )}
         </div>
 
         {/* Pagination */}
