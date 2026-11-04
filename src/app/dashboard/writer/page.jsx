@@ -14,7 +14,7 @@ const WriterHomePage = async () => {
   return (
     <div className="min-h-screen p-4 md:p-8 text-zinc-100">
       <div className="max-w-6xl mx-auto">
-        <ManageEbooks ebook={ebook} />
+        <ManageEbooks ebook={ebook} user={user} />
       </div>
     </div>
   );

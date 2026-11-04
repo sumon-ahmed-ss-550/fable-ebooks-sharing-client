@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, Button, Chip, Modal, useOverlayState } from "@heroui/react";
 import {
   PencilToSquare,
@@ -10,11 +10,14 @@ import {
   Plus,
   ShieldCheck,
   BookOpen,
+  Chart,
+  CreditCard,
 } from "@gravity-ui/icons";
 import {
   changePublishedAndUnpublishedStatus,
   deleteEbook,
 } from "@/lib/action/action";
+import { getWriterSales } from "@/lib/queries/queries";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import WriterAddEbookForm from "./WriterAddEbookForm";
@@ -51,16 +54,37 @@ const EditEbookModal = ({ book, router }) => {
   );
 };
 
-const ManageEbooks = ({ ebook = [] }) => {
+const ManageEbooks = ({ ebook = [], user = null }) => {
   const router = useRouter();
   const [deletingId, setDeletingId] = useState(null);
   const [deleteError, setDeleteError] = useState("");
+  const [salesData, setSalesData] = useState(null);
+  const [loadingSales, setLoadingSales] = useState(false);
 
   const totalBooks = ebook?.length || 0;
   const publishedCount =
     ebook?.filter((b) => b.status === "published").length || 0;
   const unpublishedCount =
     ebook?.filter((b) => b.status === "unpublished").length || 0;
+
+  const isVerified = user?.writerVerificationStatus === "verified";
+
+  // Load sales data
+  useEffect(() => {
+    if (user?.id) {
+      setLoadingSales(true);
+      getWriterSales(user.id)
+        .then((data) => {
+          setSalesData(data);
+        })
+        .catch((err) => {
+          console.error("Error loading sales:", err);
+        })
+        .finally(() => {
+          setLoadingSales(false);
+        });
+    }
+  }, [user?.id]);
 
   // handle status toggler
   const handleToggleStatus = async (id, currentStatus) => {
@@ -100,16 +124,29 @@ const ManageEbooks = ({ ebook = [] }) => {
             <span className="p-1 rounded bg-amber-400/10 text-amber-400 border border-amber-400/20 text-[10px] font-bold uppercase tracking-wider">
               Writer Studio
             </span>
-            <Chip
-              size="sm"
-              variant="flat"
-              className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold text-[10px]"
-            >
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3" />
-                Verified Writer
-              </span>
-            </Chip>
+            {isVerified ? (
+              <Chip
+                size="sm"
+                variant="flat"
+                className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold text-[10px]"
+              >
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3" />
+                  Verified Writer
+                </span>
+              </Chip>
+            ) : (
+              <Chip
+                size="sm"
+                variant="flat"
+                className="bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold text-[10px]"
+              >
+                <span className="flex items-center gap-1">
+                  <CreditCard className="w-3 h-3" />
+                  Verification Required
+                </span>
+              </Chip>
+            )}
           </div>
           <h1 className="text-2xl font-bold font-serif text-white">
             Manage Ebooks
@@ -120,10 +157,20 @@ const ManageEbooks = ({ ebook = [] }) => {
         </div>
 
         <div className="flex items-center gap-2">
+          {!isVerified && (
+            <Button
+              color="primary"
+              startContent={<CreditCard className="w-4 h-4" />}
+              className="font-semibold bg-blue-500 hover:bg-blue-600 shadow-sm cursor-pointer"
+            >
+              Verify Account
+            </Button>
+          )}
           <Link href="/dashboard/writer/edit_ebook/add_ebook">
             <Button
               color="warning"
               startContent={<Plus className="w-4 h-4" />}
+              isDisabled={!isVerified}
               className="font-semibold text-slate-950 bg-amber-400 hover:bg-amber-500 shadow-sm cursor-pointer"
             >
               Create Ebook
@@ -170,6 +217,41 @@ const ManageEbooks = ({ ebook = [] }) => {
           </span>
         </div>
       </div>
+
+      {/* Sales Overview */}
+      {isVerified && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-5 rounded-2xl bg-[#18181b] border border-zinc-800">
+            <div className="flex items-center gap-2 mb-2">
+              <Chart className="w-5 h-5 text-emerald-400" />
+              <span className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">
+                Total Sales
+              </span>
+            </div>
+            <span className="text-2xl font-black text-emerald-400 font-mono mt-1 block">
+              {loadingSales ? "..." : salesData?.totalSales || 0}
+            </span>
+            <span className="text-[11px] text-zinc-500 mt-0.5 block">
+              Successful purchases
+            </span>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-[#18181b] border border-zinc-800">
+            <div className="flex items-center gap-2 mb-2">
+              <CreditCard className="w-5 h-5 text-amber-400" />
+              <span className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">
+                Total Earnings
+              </span>
+            </div>
+            <span className="text-2xl font-black text-amber-400 font-mono mt-1 block">
+              {loadingSales ? "..." : `$${salesData?.totalEarnings?.toFixed(2) || "0.00"}`}
+            </span>
+            <span className="text-[11px] text-zinc-500 mt-0.5 block">
+              Revenue from sales
+            </span>
+          </div>
+        </div>
+      )}
 
       {deleteError && (
         <p role="alert" className="text-sm text-rose-400">
