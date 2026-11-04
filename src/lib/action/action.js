@@ -1,4 +1,3 @@
-"use server";
 import { makeRequest } from "../core/api";
 
 // --- WRITER ACTIONS ---
