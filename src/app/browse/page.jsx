@@ -12,11 +12,19 @@ const page = async ({ searchParams }) => {
     sort: searchParams.sort || "newest",
   };
 
-  const data = await getPublishedEbooks(params);
+  let data = null;
+  let isLoading = false;
+
+  try {
+    data = await getPublishedEbooks(params);
+  } catch (err) {
+    isLoading = true;
+    data = { ebooks: [], pagination: null };
+  }
 
   return (
     <div>
-      <Browse ebooks={data?.ebooks || []} pagination={data?.pagination}></Browse>
+      <Browse ebooks={data?.ebooks || []} pagination={data?.pagination} isLoading={isLoading}></Browse>
     </div>
   );
 };

@@ -4,8 +4,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { EbookCardSkeleton } from "./LoadingSkeleton";
 
-export default function EbookCard({ books = [] }) {
+export default function EbookCard({ books = [], isLoading = false }) {
   const [selectedBook, setSelectedBook] = useState(null);
 
   // Fallback mock data
@@ -153,7 +154,13 @@ export default function EbookCard({ books = [] }) {
         }}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
       >
-        {ebooks.map((book) => (
+        {isLoading ? (
+          // Show skeleton loaders while loading
+          Array.from({ length: 6 }).map((_, index) => (
+            <EbookCardSkeleton key={index} />
+          ))
+        ) : (
+          ebooks.map((book) => (
           <motion.div
             key={book.id}
             variants={{
@@ -224,7 +231,7 @@ export default function EbookCard({ books = [] }) {
               </div>
             </div>
           </motion.div>
-        ))}
+        )))}
       </motion.div>
 
       {/* Quick View Modal */}

@@ -6,10 +6,12 @@ import { getPublishedEbooks } from "@/lib/queries/queries";
 
 export default async function Home() {
   let publishedBooks = [];
+  let isLoading = false;
   try {
     publishedBooks = await getPublishedEbooks();
   } catch (err) {
     publishedBooks = [];
+    isLoading = true;
   }
 
   return (
@@ -18,7 +20,7 @@ export default async function Home() {
       <BannerSection />
 
       {/* ebook card */}
-      <EbookCard books={publishedBooks} />
+      <EbookCard books={publishedBooks} isLoading={isLoading} />
 
       {/* ebook writers */}
       <WriterCard />

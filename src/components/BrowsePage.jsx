@@ -7,8 +7,9 @@ import { authClient } from "@/lib/auth-client";
 import { readerToggleBookmark } from "@/lib/action/action";
 import { getReaderBookmarkIds } from "@/lib/queries/queries";
 import Pagination from "./Pagination";
+import { EbookCardSkeleton } from "./LoadingSkeleton";
 
-const Browse = ({ ebooks = [], pagination = null }) => {
+const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
@@ -199,7 +200,12 @@ const Browse = ({ ebooks = [], pagination = null }) => {
 
         {/* ebooks card grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredEbooks.length > 0 ? (
+          {isLoading ? (
+            // Show skeleton loaders while loading
+            Array.from({ length: 8 }).map((_, index) => (
+              <EbookCardSkeleton key={index} />
+            ))
+          ) : filteredEbooks.length > 0 ? (
             filteredEbooks.map((ebook) => {
               const ebookId = ebook._id?.$oid || ebook._id;
               const isBookmarked = !!bookmarks[ebookId];
@@ -316,7 +322,7 @@ const Browse = ({ ebooks = [], pagination = null }) => {
                 </button>
               )}
             </div>
-          )}
+          ))}
         </div>
 
         {/* Pagination */}

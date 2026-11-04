@@ -26,8 +26,9 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import { StatCardSkeleton } from "../LoadingSkeleton";
 
-export default function AdminOverview({ stats = {} }) {
+export default function AdminOverview({ stats = {}, isLoading = false }) {
   const {
     totalRevenue = 0,
     totalUsers = 0,
@@ -130,29 +131,35 @@ export default function AdminOverview({ stats = {} }) {
 
       {/* Metric Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {statCards.map((card, idx) => (
-          <Card
-            key={idx}
-            className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between shadow-lg hover:border-slate-700 transition"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                {card.label}
-              </span>
-              <div className={`p-2 rounded-xl border ${card.color}`}>
-                <card.icon className="w-4 h-4" />
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, index) => (
+            <StatCardSkeleton key={index} />
+          ))
+        ) : (
+          statCards.map((card, idx) => (
+            <Card
+              key={idx}
+              className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between shadow-lg hover:border-slate-700 transition"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  {card.label}
+                </span>
+                <div className={`p-2 rounded-xl border ${card.color}`}>
+                  <card.icon className="w-4 h-4" />
+                </div>
               </div>
-            </div>
-            <div>
-              <span className="text-3xl font-black font-mono text-slate-100 block">
-                {card.value}
-              </span>
-              <span className="text-xs text-slate-500 mt-1 block">
-                {card.sub}
-              </span>
-            </div>
-          </Card>
-        ))}
+              <div>
+                <span className="text-3xl font-black font-mono text-slate-100 block">
+                  {card.value}
+                </span>
+                <span className="text-xs text-slate-500 mt-1 block">
+                  {card.sub}
+                </span>
+              </div>
+            </Card>
+          ))
+        )}
       </div>
 
       {/* Analytics Charts Section */}
