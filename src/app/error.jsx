@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@heroui/react";
-import { House, TriangleExclamation, RotateRight } from "@gravity-ui/icons";
+import { House, TriangleExclamation, ArrowRotateRight } from "@gravity-ui/icons";
 
 export default function Error({ error, reset }) {
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function Error({ error, reset }) {
             color="primary"
             variant="solid"
             size="lg"
-            startContent={<RotateRight width={18} height={18} />}
+            startContent={<ArrowRotateRight width={18} height={18} />}
             className="w-full sm:w-auto font-medium bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-500/20"
           >
             Try Again

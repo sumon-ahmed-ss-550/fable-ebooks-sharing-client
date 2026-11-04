@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { readerToggleBookmark } from "@/lib/action/action";
 import { getReaderBookmarkIds } from "@/lib/queries/queries";
-import Pagination from "./Pagination";
+import SimplePagination from "./Pagination";
 import { EbookCardSkeleton } from "./LoadingSkeleton";
 
 const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
@@ -329,7 +329,7 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
         {/* Pagination */}
         {pagination && pagination.pages > 1 && (
           <div className="mt-8 flex justify-center">
-            <Pagination
+            <SimplePagination
               currentPage={pagination.page}
               totalPages={pagination.pages}
               onPageChange={(page) => {
