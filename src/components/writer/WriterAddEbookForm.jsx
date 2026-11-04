@@ -12,6 +12,7 @@ import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { updateEbook, writerInsertEbook } from "@/lib/action/action";
+import { toast } from "sonner";
 
 const WriterAddEbookForm = ({ ebook = null, onSuccess }) => {
   const isEditing = Boolean(ebook);
@@ -97,8 +98,14 @@ const WriterAddEbookForm = ({ ebook = null, onSuccess }) => {
 
       if (isEditing) {
         await updateEbook(ebook._id, ebookPayload);
+        toast.success("Ebook updated successfully!", {
+          description: `"${formData.title}" has been updated.`,
+        });
       } else {
         await writerInsertEbook(ebookPayload);
+        toast.success("Ebook published successfully!", {
+          description: `"${formData.title}" is now live on Fable.`,
+        });
       }
 
       setStatusMessage({
@@ -120,6 +127,9 @@ const WriterAddEbookForm = ({ ebook = null, onSuccess }) => {
       setStatusMessage({
         type: "error",
         text: err.message || "An unexpected error occurred.",
+      });
+      toast.error("Failed to save ebook", {
+        description: err.message || "An unexpected error occurred.",
       });
     } finally {
       setLoading(false);

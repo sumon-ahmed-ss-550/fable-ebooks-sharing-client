@@ -5,6 +5,7 @@ import { Card, Button, Input, Chip } from "@heroui/react";
 import { Person, CircleCheckFill, CircleExclamation, ShieldCheck } from "@gravity-ui/icons";
 import { readerUpdateProfile } from "@/lib/action/action";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function ProfileManager({ user }) {
   const router = useRouter();
@@ -21,9 +22,15 @@ export default function ProfileManager({ user }) {
     try {
       await readerUpdateProfile(user?.id, { name, image });
       setStatusMsg({ type: "success", text: "Profile updated successfully!" });
+      toast.success("Profile updated successfully!", {
+        description: "Your profile changes have been saved.",
+      });
       router.refresh();
     } catch (err) {
       setStatusMsg({ type: "error", text: err.message || "Failed to update profile." });
+      toast.error("Failed to update profile", {
+        description: err.message || "Please try again later.",
+      });
     } finally {
       setIsLoading(false);
     }

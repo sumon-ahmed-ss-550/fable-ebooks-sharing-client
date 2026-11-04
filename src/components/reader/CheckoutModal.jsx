@@ -6,6 +6,7 @@ import { CreditCard, CircleCheckFill, CircleExclamation, ShieldCheck, Lock } fro
 import Image from "next/image";
 import { readerMakePurchase } from "@/lib/action/action";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function CheckoutModal({ ebook, user, onPurchaseSuccess, onCancel }) {
   const router = useRouter();
@@ -35,9 +36,15 @@ export default function CheckoutModal({ ebook, user, onPurchaseSuccess, onCancel
         setIsSuccess(true);
         router.refresh();
         onPurchaseSuccess?.(res.purchase);
+        toast.success("Purchase completed successfully!", {
+          description: `${ebook.title} has been added to your library.`,
+        });
       }
     } catch (err) {
       setErrorMsg(err.message || "Failed to complete transaction. Please try again.");
+      toast.error("Purchase failed", {
+        description: err.message || "Failed to complete transaction. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }

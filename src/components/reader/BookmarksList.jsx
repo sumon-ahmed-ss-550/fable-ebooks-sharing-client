@@ -7,20 +7,27 @@ import { Button, Chip } from "@heroui/react";
 import { Bookmark, BookmarkFill, TrashBin } from "@gravity-ui/icons";
 import { readerToggleBookmark } from "@/lib/action/action";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function BookmarksList({ initialBookmarks = [], user }) {
   const router = useRouter();
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
   const [removingId, setRemovingId] = useState(null);
 
-  const handleRemove = async (ebookId) => {
+  const handleRemove = async (ebookId, ebookTitle) => {
     setRemovingId(ebookId);
     try {
       await readerToggleBookmark(user?.id, ebookId);
       setBookmarks((prev) => prev.filter((b) => (b._id?.$oid || b._id) !== ebookId));
+      toast.success("Bookmark removed", {
+        description: `"${ebookTitle}" has been removed from your bookmarks.`,
+      });
       router.refresh();
     } catch (err) {
       console.error(err);
+      toast.error("Failed to remove bookmark", {
+        description: "Please try again later.",
+      });
     } finally {
       setRemovingId(null);
     }
@@ -81,7 +88,7 @@ export default function BookmarksList({ initialBookmarks = [], user }) {
                       {book.genre || "General"}
                     </span>
                     <button
-                      onClick={() => handleRemove(ebookId)}
+                      onClick={() => handleRemove(ebookId, book.title)}
                       disabled={removingId === ebookId}
                       className="absolute top-2.5 right-2.5 p-2 rounded-full bg-slate-950/80 text-rose-400 hover:bg-rose-500 hover:text-white transition-colors border border-slate-800"
                       title="Remove Bookmark"
