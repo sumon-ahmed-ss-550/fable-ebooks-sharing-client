@@ -1,18 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button, Chip } from "@heroui/react";
 import { Bookmark, BookmarkFill, TrashBin } from "@gravity-ui/icons";
 import { readerToggleBookmark } from "@/lib/action/action";
-import { useRouter } from "next/navigation";
+import { getReaderBookmarks } from "@/lib/queries/queries";
 import { toast } from "sonner";
 
 export default function BookmarksList({ initialBookmarks = [], user }) {
-  const router = useRouter();
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
   const [removingId, setRemovingId] = useState(null);
+
+  // Sync bookmarks with initialBookmarks prop
+  useEffect(() => {
+    setBookmarks(initialBookmarks);
+  }, [initialBookmarks]);
 
   const handleRemove = async (ebookId, ebookTitle) => {
     setRemovingId(ebookId);
@@ -22,7 +26,11 @@ export default function BookmarksList({ initialBookmarks = [], user }) {
       toast.success("Bookmark removed", {
         description: `"${ebookTitle}" has been removed from your bookmarks.`,
       });
-      router.refresh();
+      // Refresh bookmarks from server
+      if (user?.id) {
+        const freshBookmarks = await getReaderBookmarks(user.id);
+        setBookmarks(Array.isArray(freshBookmarks) ? freshBookmarks : []);
+      }
     } catch (err) {
       console.error(err);
       toast.error("Failed to remove bookmark", {

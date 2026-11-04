@@ -1,45 +1,37 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { authClient } from "@/lib/auth-client";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { getReaderBookmarks } from "@/lib/queries/queries";
 import BookmarksList from "@/components/reader/BookmarksList";
 
-const ReaderBookmarkPage = () => {
-  const { data: session } = authClient.useSession();
+export default async function ReaderBookmarkPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   const user = session?.user;
-  const [bookmarks, setBookmarks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchBookmarks = async () => {
-      if (user?.id) {
-        try {
-          const data = await getReaderBookmarks(user.id);
-          setBookmarks(Array.isArray(data) ? data : []);
-        } catch (error) {
-          console.error("Failed to fetch bookmarks:", error);
-          setBookmarks([]);
-        }
-      }
-      setIsLoading(false);
-    };
+  let bookmarks = [];
+  let error = null;
 
-    fetchBookmarks();
-  }, [user?.id]);
+  if (user?.id) {
+    try {
+      const data = await getReaderBookmarks(user.id);
+      bookmarks = Array.isArray(data) ? data : [];
+    } catch (err) {
+      error = err.message;
+      bookmarks = [];
+    }
+  }
 
   return (
     <div className="min-h-screen p-4 md:p-8 text-slate-100 max-w-7xl mx-auto">
-      {isLoading ? (
+      {error ? (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-slate-400">Loading bookmarks...</p>
+          <p className="text-red-400">Error: {error}</p>
+          <p className="text-slate-400 mt-2">Please try logging in again.</p>
         </div>
       ) : (
         <BookmarksList initialBookmarks={bookmarks} user={user} />
       )}
     </div>
   );
-};
-
-export default ReaderBookmarkPage;
+}

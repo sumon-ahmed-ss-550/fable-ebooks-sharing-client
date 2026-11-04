@@ -82,7 +82,7 @@ const ManageEbooks = ({ ebook = [], user = null }) => {
   // Paginate ebooks
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedEbooks = localEbooks?.slice(startIndex, endIndex) || [];
+  const paginatedEbooks = localEbooks?.filter((book) => book && book._id).slice(startIndex, endIndex) || [];
 
   // Sync local ebooks with prop
   useEffect(() => {
@@ -346,11 +346,13 @@ const ManageEbooks = ({ ebook = [], user = null }) => {
                     </Table.Cell>
                   </Table.Row>
                 ) : (
-                  paginatedEbooks.map((book) => (
-                    <Table.Row
-                      key={book._id}
-                      className="border-b border-zinc-800/60 hover:bg-zinc-800/40 transition-colors"
-                    >
+                  paginatedEbooks
+                    .filter((book) => book && book._id)
+                    .map((book) => (
+                      <Table.Row
+                        key={book._id}
+                        className="border-b border-zinc-800/60 hover:bg-zinc-800/40 transition-colors"
+                      >
                       {/* Title */}
                       <Table.Cell className="font-medium text-zinc-100">
                         <div>
@@ -438,11 +440,13 @@ const ManageEbooks = ({ ebook = [], user = null }) => {
                             book={book}
                             router={router}
                             onUpdate={(updatedEbook) => {
-                              setLocalEbooks((prev) =>
-                                prev.map((b) =>
-                                  b._id === updatedEbook._id ? updatedEbook : b
-                                )
-                              );
+                              if (updatedEbook && updatedEbook._id) {
+                                setLocalEbooks((prev) =>
+                                  prev.map((b) =>
+                                    b._id === updatedEbook._id ? updatedEbook : b
+                                  )
+                                );
+                              }
                             }}
                           />
 

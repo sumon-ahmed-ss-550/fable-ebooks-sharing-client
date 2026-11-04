@@ -68,7 +68,8 @@ export const readerMakePurchase = async (purchasePayload) => {
 
 // toggle bookmark
 export const readerToggleBookmark = async (userId, ebookId) => {
-  return await makeRequest(
+  console.log("Sending bookmark toggle request:", { userId, ebookId });
+  const result = await makeRequest(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/api/reader/bookmark/toggle`,
     {
       method: "POST",
@@ -76,6 +77,8 @@ export const readerToggleBookmark = async (userId, ebookId) => {
       body: JSON.stringify({ userId, ebookId }),
     },
   );
+  console.log("Bookmark toggle response:", result);
+  return result;
 };
 
 // update profile

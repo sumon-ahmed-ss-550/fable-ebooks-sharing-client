@@ -1,20 +1,8 @@
 import { auth } from "@/lib/auth";
-import {
-  Bars,
-  Bookmark,
-  BookOpen,
-  ChartBar,
-  ClockArrowRotateLeft,
-  CreditCard,
-  House,
-  Person,
-} from "@gravity-ui/icons";
-import { Button, Drawer } from "@heroui/react";
 import { headers } from "next/headers";
-import Link from "next/link";
-import { LuBookPlus } from "react-icons/lu";
+import { LayoutContentClient } from "./LayoutContentClient";
 
-export async function LayoutContent() {
+export async function LayoutContent({ mode = "desktop" }) {
   // users session
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -24,22 +12,22 @@ export async function LayoutContent() {
   // reader nav items
   const readerNavItems = [
     {
-      icon: ClockArrowRotateLeft,
+      iconName: "ClockArrowRotateLeft",
       label: "Purchase History",
       href: "/dashboard/reader",
     },
     {
-      icon: BookOpen,
+      iconName: "BookOpen",
       label: "Purchased Ebooks",
       href: "/dashboard/reader/purchaseEbook",
     },
     {
-      icon: Person,
+      iconName: "Person",
       label: "Profile Management",
       href: "/dashboard/reader/purchaseEbook/bookmark/profile",
     },
     {
-      icon: Bookmark,
+      iconName: "Bookmark",
       label: "Bookmark Page",
       href: "/dashboard/reader/purchaseEbook/bookmark",
     },
@@ -47,31 +35,31 @@ export async function LayoutContent() {
 
   // writer nav items
   const writerNavItems = [
-    { icon: BookOpen, label: "Manage Ebooks", href: "/dashboard/writer" },
+    { iconName: "BookOpen", label: "Manage Ebooks", href: "/dashboard/writer" },
     {
-      icon: LuBookPlus,
+      iconName: "LuBookPlus",
       label: "Add Ebook",
       href: "/dashboard/writer/edit_ebook/add_ebook",
     },
-    { icon: Bookmark, label: "Bookmark Page", href: "/dashboard/writer/bookmarks" },
-    { icon: ChartBar, label: "Sales History", href: "/dashboard/writer/sales" },
+    { iconName: "Bookmark", label: "Bookmark Page", href: "/dashboard/writer/bookmarks" },
+    { iconName: "ChartBar", label: "Sales History", href: "/dashboard/writer/sales" },
   ];
 
   // admin nav items
   const adminNavItems = [
-    { icon: House, label: "Home", href: "/dashboard/admin" },
+    { iconName: "House", label: "Home", href: "/dashboard/admin" },
     {
-      icon: Person,
+      iconName: "Person",
       label: "Manage Users",
       href: "/dashboard/admin/transaction/users",
     },
     {
-      icon: BookOpen,
+      iconName: "BookOpen",
       label: "Manage All Ebooks",
       href: "/dashboard/admin/transaction/users/ebook",
     },
     {
-      icon: CreditCard,
+      iconName: "CreditCard",
       label: "View All Transactions",
       href: "/dashboard/admin/transaction",
     },
@@ -85,47 +73,5 @@ export async function LayoutContent() {
   };
   const navItems = dashboardContentSelected[user?.role];
 
-  //   nav links
-  const layoutNavLinks = (
-    <nav className="flex flex-col gap-1">
-      {navItems?.map((item) => (
-        <Link
-          href={item.href}
-          key={item.label}
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-default"
-          type="button"
-        >
-          <item.icon className="size-5 text-muted" />
-          {item.label}
-        </Link>
-      ))}
-    </nav>
-  );
-
-  return (
-    <Drawer>
-      {/* desktop */}
-      <aside className="w-64 border-r shrink-0 p-4 hidden lg:block">
-        {layoutNavLinks}
-      </aside>
-
-      {/* mobile menu button */}
-      <Button variant="secondary" className="lg:hidden">
-        <Bars />
-        Menu
-      </Button>
-
-      <Drawer.Backdrop>
-        <Drawer.Content placement="left">
-          <Drawer.Dialog>
-            <Drawer.CloseTrigger />
-            <Drawer.Header>
-              <Drawer.Heading>Navigation</Drawer.Heading>
-            </Drawer.Header>
-            <Drawer.Body>{layoutNavLinks}</Drawer.Body>
-          </Drawer.Dialog>
-        </Drawer.Content>
-      </Drawer.Backdrop>
-    </Drawer>
-  );
+  return <LayoutContentClient navItems={navItems} mode={mode} />;
 }

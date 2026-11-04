@@ -97,28 +97,25 @@ const WriterAddEbookForm = ({ ebook = null, onSuccess }) => {
       };
 
       if (isEditing) {
-        await updateEbook(ebook._id, ebookPayload);
+        const updatedData = await updateEbook(ebook._id, ebookPayload);
         toast.success("Ebook updated successfully!", {
           description: `"${formData.title}" has been updated.`,
         });
+        setStatusMessage({
+          type: "success",
+          text: "Ebook updated successfully!",
+        });
+        router.refresh();
+        onSuccess?.({ ...ebook, ...ebookPayload, coverImage: coverImageUrl });
       } else {
         await writerInsertEbook(ebookPayload);
         toast.success("Ebook published successfully!", {
           description: `"${formData.title}" is now live on Fable.`,
         });
-      }
-
-      setStatusMessage({
-        type: "success",
-        text: isEditing
-          ? "Ebook updated successfully!"
-          : "Ebook added successfully!",
-      });
-
-      if (isEditing) {
-        router.refresh();
-        onSuccess?.();
-      } else {
+        setStatusMessage({
+          type: "success",
+          text: "Ebook added successfully!",
+        });
         setFormData({ title: "", description: "", price: "", genre: "" });
         setCoverImage(null);
         setImagePreview(null);
