@@ -11,6 +11,21 @@ import {
   ArrowRight,
   Receipt,
 } from "@gravity-ui/icons";
+import {
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 
 export default function AdminOverview({ stats = {} }) {
   const {
@@ -22,6 +37,34 @@ export default function AdminOverview({ stats = {} }) {
     totalTransactions = 0,
     recentPurchases = [],
   } = stats;
+
+  // Prepare chart data
+  const userDistributionData = [
+    { name: "Readers", value: readersCount, color: "#6366f1" },
+    { name: "Writers", value: writersCount, color: "#f59e0b" },
+  ];
+
+  // Process recent purchases for revenue chart
+  const revenueChartData = recentPurchases
+    .slice(0, 10)
+    .map((txn) => ({
+      date: new Date(txn.purchasedAt).toLocaleDateString(),
+      amount: Number(txn.price || 0),
+      ebook: txn.ebookTitle,
+    }))
+    .reverse();
+
+  // Calculate genre distribution from recent purchases
+  const genreData = recentPurchases.reduce((acc, txn) => {
+    const genre = txn.genre || "Other";
+    acc[genre] = (acc[genre] || 0) + 1;
+    return acc;
+  }, {});
+
+  const genreChartData = Object.entries(genreData).map(([name, value]) => ({
+    name,
+    value,
+  }));
 
   const statCards = [
     {
@@ -111,6 +154,120 @@ export default function AdminOverview({ stats = {} }) {
           </Card>
         ))}
       </div>
+
+      {/* Analytics Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* User Distribution Pie Chart */}
+        <Card className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 shadow-xl">
+          <h3 className="text-sm font-bold text-slate-100 font-serif mb-4">User Distribution</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie
+                data={userDistributionData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                {userDistributionData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#0f172a",
+                  border: "1px solid #334155",
+                  borderRadius: "8px",
+                  color: "#f1f5f9",
+                }}
+              />
+              <Legend
+                verticalAlign="bottom"
+                height={36}
+                iconType="circle"
+                wrapperStyle={{ fontSize: "12px", color: "#94a3b8" }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </Card>
+
+        {/* Revenue Trend Line Chart */}
+        <Card className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 shadow-xl">
+          <h3 className="text-sm font-bold text-slate-100 font-serif mb-4">Recent Revenue Trends</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={revenueChartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+              <XAxis
+                dataKey="date"
+                stroke="#94a3b8"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                stroke="#94a3b8"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => `$${value}`}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#0f172a",
+                  border: "1px solid #334155",
+                  borderRadius: "8px",
+                  color: "#f1f5f9",
+                }}
+                formatter={(value) => [`$${value.toFixed(2)}`, "Revenue"]}
+              />
+              <Line
+                type="monotone"
+                dataKey="amount"
+                stroke="#f59e0b"
+                strokeWidth={2}
+                dot={{ fill: "#f59e0b", r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </Card>
+      </div>
+
+      {/* Genre Distribution Bar Chart */}
+      {genreChartData.length > 0 && (
+        <Card className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 shadow-xl">
+          <h3 className="text-sm font-bold text-slate-100 font-serif mb-4">Genre Popularity</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={genreChartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+              <XAxis
+                dataKey="name"
+                stroke="#94a3b8"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                stroke="#94a3b8"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#0f172a",
+                  border: "1px solid #334155",
+                  borderRadius: "8px",
+                  color: "#f1f5f9",
+                }}
+              />
+              <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+      )}
 
       {/* Quick Navigation Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
