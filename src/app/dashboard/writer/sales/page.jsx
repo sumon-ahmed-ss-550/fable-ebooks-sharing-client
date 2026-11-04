@@ -110,7 +110,7 @@ const WriterSalesPage = () => {
               <Table.ScrollContainer>
                 <Table.Content aria-label="Writer Sales Table">
                   <Table.Header>
-                    <Table.Column className="text-zinc-400 font-semibold">Ebook Title</Table.Column>
+                    <Table.Column isRowHeader className="text-zinc-400 font-semibold">Ebook Title</Table.Column>
                     <Table.Column className="text-zinc-400 font-semibold">Buyer Name</Table.Column>
                     <Table.Column className="text-zinc-400 font-semibold">Transaction ID</Table.Column>
                     <Table.Column className="text-zinc-400 font-semibold">Price</Table.Column>
