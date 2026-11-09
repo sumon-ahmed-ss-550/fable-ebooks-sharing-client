@@ -35,6 +35,10 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
     ...new Set(availableEbooks.map((ebook) => ebook.genre).filter(Boolean)),
   ].sort((first, second) => first.localeCompare(second));
 
+  // Normalize selected genre for comparison
+  const normalizedSelectedGenre = selectedGenre.toLowerCase();
+  const normalizedGenres = genres.map(g => g.toLowerCase());
+
   // Debounced function to update URL params
   const updateURL = useCallback((params) => {
     const currentParams = new URLSearchParams(searchParams.toString());

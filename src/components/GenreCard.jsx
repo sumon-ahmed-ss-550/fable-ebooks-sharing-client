@@ -53,7 +53,7 @@ export default function GenreCard() {
         {genres.map((genre) => (
           <motion.a
             key={genre.name}
-            href={`/browse?genre=${encodeURIComponent(genre.name.toLowerCase())}`}
+            href={`/browse?genre=${encodeURIComponent(genre.name)}`}
             variants={{
               hidden: { opacity: 0, scale: 0.95 },
               visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
