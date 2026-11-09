@@ -28,10 +28,24 @@ export default function PaymentSuccess() {
           // Create purchase record if transaction is completed but no purchase exists
           if (response?.transaction && response.transaction.transactionType === "ebook_purchase") {
             try {
-              const session = await authClient.getSession();
-              const user = session?.user;
+              // Try to get user from session first
+              let user = null;
+              try {
+                const session = await authClient.getSession();
+                user = session?.user;
+                console.log("User session:", user);
+              } catch (sessionError) {
+                console.log("Session fetch failed, trying localStorage:", sessionError);
+              }
 
-              console.log("User session:", user);
+              // If no session, try localStorage
+              if (!user) {
+                const userInfo = localStorage.getItem("user_info");
+                if (userInfo) {
+                  user = JSON.parse(userInfo);
+                  console.log("User from localStorage:", user);
+                }
+              }
 
               if (user) {
                 // Get JWT token from localStorage
@@ -62,10 +76,14 @@ export default function PaymentSuccess() {
                 console.log("Purchase creation response:", purchaseResult);
                 console.log("Purchase response status:", purchaseResponse.status);
               } else {
-                console.error("No user session found");
+                console.error("No user found in session or localStorage");
+                // Still redirect even if purchase creation fails
+                setStatus("success");
               }
             } catch (error) {
               console.error("Error creating purchase record:", error);
+              // Still redirect even if purchase creation fails
+              setStatus("success");
             }
           } else {
             console.log("Transaction not ebook_purchase or no transaction found");
