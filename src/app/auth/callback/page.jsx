@@ -13,11 +13,17 @@ export default function AuthCallback() {
       try {
         // Get the session after OAuth callback
         const session = await authClient.getSession();
-        
+
         if (session?.data) {
           // Exchange token
-          await exchangeToken(session.data);
-          
+          const tokenResponse = await exchangeToken(session.data);
+
+          if (!tokenResponse?.token) {
+            console.error("Token exchange failed");
+            router.push("/signIn");
+            return;
+          }
+
           // Redirect based on role
           const user = session.data.user;
           const selectedPath = {
@@ -25,7 +31,7 @@ export default function AuthCallback() {
             writer: "/dashboard/writer",
             admin: "/dashboard/admin",
           };
-          
+
           const targetPath = selectedPath[user?.role] || "/";
           router.push(targetPath);
         } else {

@@ -2,6 +2,7 @@
 const nextConfig = {
   /* config options here */
   reactCompiler: true,
+  allowedDevOrigins: ['127.0.0.1'],
   images: {
     remotePatterns: [
       {
@@ -11,6 +12,10 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "picsum.photos",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ibb.co",
       },
     ],
   },

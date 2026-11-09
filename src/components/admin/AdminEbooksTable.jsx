@@ -6,6 +6,7 @@ import { BookOpen, TrashBin, Eye, EyeSlash, Magnifier } from "@gravity-ui/icons"
 import { adminChangeEbookStatus, adminDeleteEbook } from "@/lib/action/action";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import SimplePagination from "../Pagination";
 
 export default function AdminEbooksTable({ initialEbooks = [] }) {
   const router = useRouter();
@@ -13,11 +14,19 @@ export default function AdminEbooksTable({ initialEbooks = [] }) {
   const [search, setSearch] = useState("");
   const [loadingId, setLoadingId] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const itemsPerPage = 12;
 
   const filteredEbooks = ebooks.filter((b) =>
     (b.title || "").toLowerCase().includes(search.toLowerCase()) ||
     (b.genre || "").toLowerCase().includes(search.toLowerCase())
   );
+
+  const totalPages = Math.ceil(filteredEbooks.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedEbooks = filteredEbooks.slice(startIndex, endIndex);
 
   const handleToggleStatus = async (ebookId, currentStatus) => {
     const nextStatus = currentStatus === "published" ? "unpublished" : "published";
@@ -35,6 +44,11 @@ export default function AdminEbooksTable({ initialEbooks = [] }) {
     } finally {
       setLoadingId(null);
     }
+  };
+
+  const handleSearchChange = (value) => {
+    setSearch(value);
+    setCurrentPage(1);
   };
 
   const handleDeleteEbook = async (ebookId, title) => {
@@ -84,7 +98,7 @@ export default function AdminEbooksTable({ initialEbooks = [] }) {
               type="text"
               placeholder="Search by title or genre..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-9 pr-4 py-2 rounded-xl border border-slate-800 bg-slate-950 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-amber-400 w-64"
             />
           </div>
@@ -112,14 +126,14 @@ export default function AdminEbooksTable({ initialEbooks = [] }) {
               </Table.Header>
 
               <Table.Body>
-                {filteredEbooks.length === 0 ? (
+                {paginatedEbooks.length === 0 ? (
                   <Table.Row>
                     <Table.Cell colSpan={6} className="text-center py-10 text-slate-500">
                       No ebooks found.
                     </Table.Cell>
                   </Table.Row>
                 ) : (
-                  filteredEbooks.map((book) => (
+                  paginatedEbooks.map((book) => (
                     <Table.Row
                       key={book._id}
                       className="border-b border-slate-800/60 hover:bg-slate-800/40 transition-colors"
@@ -233,12 +247,24 @@ export default function AdminEbooksTable({ initialEbooks = [] }) {
             </Table.Content>
           </Table.ScrollContainer>
           <Table.Footer>
-            <div className="px-4 py-3 text-xs text-slate-400 border-t border-slate-800">
-              Total Books: {ebooks.length}
+            <div className="px-4 py-3 text-xs text-slate-400 border-t border-slate-800 flex items-center justify-between">
+              <span>Total Books: {ebooks.length}</span>
+              <span>Showing {startIndex + 1}-{Math.min(endIndex, filteredEbooks.length)} of {filteredEbooks.length}</span>
             </div>
           </Table.Footer>
         </Table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex justify-center">
+          <SimplePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
     </div>
   );
 }

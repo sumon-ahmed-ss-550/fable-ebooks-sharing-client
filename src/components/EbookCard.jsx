@@ -11,20 +11,24 @@ export default function EbookCard({ books = [], isLoading = false }) {
 
   // Map real books data to expected format
   const ebooks = Array.isArray(books) && books.length > 0
-    ? books.slice(0, 6).map((b) => ({
-        id: b._id,
-        title: b.title,
-        author: "Fable Author",
-        genre: b.genre || "Featured",
-        rating: 4.8,
-        reviews: Math.floor(Math.random() * 200) + 50,
-        cover: b.coverImage,
-        price: `$${Number(b.price || 0).toFixed(2)}`,
-        description: b.description,
-        pages: Math.floor(Math.random() * 400) + 200,
-        published: b.createdAt ? new Date(b.createdAt).getFullYear() : "2024",
-        isRealBook: true,
-      }))
+    ? books.slice(0, 6).map((b) => {
+        // Use deterministic values based on book ID to avoid hydration mismatch
+        const idHash = b._id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        return {
+          id: b._id,
+          title: b.title,
+          author: "Fable Author",
+          genre: b.genre || "Featured",
+          rating: 4.8,
+          reviews: 50 + (idHash % 150), // Deterministic value between 50-200
+          cover: b.coverImage,
+          price: `$${Number(b.price || 0).toFixed(2)}`,
+          description: b.description,
+          pages: 200 + (idHash % 300), // Deterministic value between 200-500
+          published: b.createdAt ? new Date(b.createdAt).getFullYear() : "2024",
+          isRealBook: true,
+        };
+      })
     : [];
 
   return (

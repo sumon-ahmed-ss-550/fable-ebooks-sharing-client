@@ -9,9 +9,9 @@ export function LayoutContentClient({ navItems, mode = "desktop" }) {
 
   return (
     <Drawer>
-      {/* desktop - fixed sidebar */}
+      {/* desktop - scrollable sidebar */}
       {mode === "desktop" && (
-        <aside className="w-64 border-r h-full p-4 hidden lg:block">
+        <aside className="w-80 border-r border-slate-200 p-4 hidden lg:block overflow-y-auto shadow-sm h-screen">
           {layoutNavLinks}
         </aside>
       )}

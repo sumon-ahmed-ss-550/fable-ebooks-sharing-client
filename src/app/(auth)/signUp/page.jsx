@@ -83,7 +83,14 @@ export default function SignUpPage() {
       }
 
       // Exchange Better Auth session for JWT token
-      await exchangeToken(data);
+      const tokenResponse = await exchangeToken(data);
+
+      if (!tokenResponse?.token) {
+        setErrorMessage("Failed to establish session. Please try again.");
+        setIsLoading(false);
+        setStep(1);
+        return;
+      }
 
       setIsSubmitted(true);
       setTimeout(() => {

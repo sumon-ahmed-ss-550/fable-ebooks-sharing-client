@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { Button, Input } from "@heroui/react";
 
@@ -16,6 +17,8 @@ import {
 import { FiTwitter, FiYoutube } from "react-icons/fi";
 
 export default function Footer() {
+  const pathname = usePathname();
+  const isDashboard = pathname?.startsWith("/dashboard");
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
@@ -45,7 +48,7 @@ export default function Footer() {
 
   return (
     <footer className="w-full bg-slate-900 text-slate-300 border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+      <div className={`px-4 sm:px-6 lg:px-8 pt-12 pb-8 ${isDashboard ? "lg:ml-0" : "max-w-7xl mx-auto"}`}>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 pb-12 border-b border-slate-800">
           {/* Brand Info */}
           <div className="md:col-span-4 space-y-4">

@@ -2,6 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getOneEbook } from "@/lib/queries/queries";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import BuyNowButton from "./BuyNowButton";
 
 const EbookDetailsPage = async ({ params }) => {
   const { id } = await params;
@@ -10,6 +13,11 @@ const EbookDetailsPage = async ({ params }) => {
   if (!ebook) {
     notFound();
   }
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const user = session?.user;
 
   return (
     <main className="min-h-[70vh] bg-slate-950 px-4 py-10 text-slate-100 sm:px-6 sm:py-16 lg:px-8">
@@ -76,13 +84,7 @@ const EbookDetailsPage = async ({ params }) => {
               )}
             </div>
 
-            <Link
-              href={`/dashboard/reader/purchaseEbook?ebookId=${encodeURIComponent(id)}`}
-              className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-6 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-amber-400/10 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
-            >
-              Buy Now
-              <span aria-hidden="true">→</span>
-            </Link>
+            <BuyNowButton ebook={ebook} user={user} />
           </div>
         </article>
       </div>

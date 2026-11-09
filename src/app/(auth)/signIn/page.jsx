@@ -47,7 +47,13 @@ export default function SignInPage() {
       const user = data?.user;
 
       // Exchange Better Auth session for JWT token
-      await exchangeToken(data);
+      const tokenResponse = await exchangeToken(data);
+
+      if (!tokenResponse?.token) {
+        setErrorMessage("Failed to establish session. Please try again.");
+        setIsLoading(false);
+        return;
+      }
 
       // selected redirect path with role
       const selectedPath = {

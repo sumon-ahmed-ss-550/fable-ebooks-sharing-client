@@ -1,5 +1,19 @@
 import { makeRequest } from "../core/api";
 
+// --- PAYMENT ACTIONS ---
+
+// create stripe checkout session for ebook purchase
+export const createStripeCheckoutSession = async (userId, ebookId) => {
+  return await makeRequest(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/payment/create-checkout-session`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ userId, ebookId }),
+    }
+  );
+};
+
 // --- WRITER ACTIONS ---
 
 // writer make ebook insert request

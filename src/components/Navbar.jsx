@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
@@ -15,7 +15,7 @@ import {
   ArrowRightFromSquare,
 } from "@gravity-ui/icons";
 import { authClient } from "@/lib/auth-client";
-import { exchangeToken, clearAuthData } from "@/lib/auth-backend";
+import { exchangeToken, clearAuthData, getJWTToken } from "@/lib/auth-backend";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -25,6 +25,17 @@ export default function Navbar() {
   // user session
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
+
+  // Auto-exchange token when session exists but JWT token is missing
+  useEffect(() => {
+    const ensureToken = async () => {
+      if (session && !getJWTToken()) {
+        console.log("Session exists but no JWT token, exchanging...");
+        await exchangeToken(session);
+      }
+    };
+    ensureToken();
+  }, [session]);
 
   // navigation links
   const navLinks = [

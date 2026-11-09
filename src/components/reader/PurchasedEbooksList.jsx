@@ -6,11 +6,9 @@ import Link from "next/link";
 import { Chip } from "@heroui/react";
 import { BookOpen, Magnifier } from "@gravity-ui/icons";
 import EbookReaderModal from "./EbookReaderModal";
-import CheckoutModal from "./CheckoutModal";
 
-export default function PurchasedEbooksList({ books = [], user, pendingEbook = null }) {
+export default function PurchasedEbooksList({ books = [], user }) {
   const [search, setSearch] = useState("");
-  const [showCheckout, setShowCheckout] = useState(Boolean(pendingEbook));
 
   const filtered = books.filter((b) =>
     b.title?.toLowerCase().includes(search.toLowerCase()) ||
@@ -19,15 +17,6 @@ export default function PurchasedEbooksList({ books = [], user, pendingEbook = n
 
   return (
     <div className="w-full space-y-6">
-      {/* Checkout Modal if user arrived with ?ebookId=... */}
-      {showCheckout && pendingEbook && (
-        <CheckoutModal
-          ebook={pendingEbook}
-          user={user}
-          onCancel={() => setShowCheckout(false)}
-          onPurchaseSuccess={() => setShowCheckout(false)}
-        />
-      )}
 
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/90 p-6 rounded-3xl border border-slate-800 shadow-xl">
