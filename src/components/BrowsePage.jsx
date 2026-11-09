@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { readerToggleBookmark } from "@/lib/action/action";
 import { getReaderBookmarkIds } from "@/lib/queries/queries";
@@ -13,17 +13,53 @@ import { EbookCardSkeleton } from "./LoadingSkeleton";
 const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
   const { data: session } = authClient.useSession();
   const user = session?.user;
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [bookmarks, setBookmarks] = useState({});
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [sortOrder, setSortOrder] = useState("newest");
+  const [searchInput, setSearchInput] = useState("");
+
+  // Get filter values from URL
+  const searchQuery = searchParams.get("search") || "";
+  const selectedGenre = searchParams.get("genre") || "";
+  const maxPrice = searchParams.get("maxPrice") || "";
+  const sortOrder = searchParams.get("sort") || "title-asc";
+
+  // Sync search input with URL on mount and URL changes
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
 
   const availableEbooks = Array.isArray(ebooks) ? ebooks : [];
   const genres = [
     ...new Set(availableEbooks.map((ebook) => ebook.genre).filter(Boolean)),
   ].sort((first, second) => first.localeCompare(second));
+
+  // Debounced function to update URL params
+  const updateURL = useCallback((params) => {
+    const currentParams = new URLSearchParams(searchParams.toString());
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === "" || value === null || value === undefined) {
+        currentParams.delete(key);
+      } else {
+        currentParams.set(key, value);
+      }
+    });
+    router.push(`/browse?${currentParams.toString()}`);
+  }, [searchParams, router]);
+
+  // Debounced search update
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Only update if the search param is different from current value
+      const currentSearch = searchParams.get("search") || "";
+      if (currentSearch !== searchInput) {
+        updateURL({ search: searchInput });
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [searchInput, searchParams, updateURL]);
 
   // Load existing bookmarks for logged in user
   useEffect(() => {
@@ -57,43 +93,25 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
     }
   };
 
-  const normalizedQuery = searchQuery.trim().toLowerCase();
-
-  const filteredEbooks = availableEbooks
-    .filter((ebook) => {
-      const matchesQuery = [
-        ebook.title,
-        ebook.description,
-        ebook.genre,
-        ebook.author,
-      ]
-        .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(normalizedQuery));
-
-      const matchesGenre = !selectedGenre || ebook.genre === selectedGenre;
-      const matchesPrice =
-        maxPrice === "" ||
-        (Number.isFinite(Number(ebook.price)) &&
-          Number(ebook.price) <= Number(maxPrice));
-
-      return matchesQuery && matchesGenre && matchesPrice;
-    })
-    .sort((first, second) => {
-      if (sortOrder === "price-asc") {
-        return Number(first.price || 0) - Number(second.price || 0);
-      }
-      if (sortOrder === "price-desc") {
-        return Number(second.price || 0) - Number(first.price || 0);
-      }
-      return (first.title || "").localeCompare(second.title || "");
-    });
-
   const clearFilters = () => {
-    setSearchQuery("");
-    setSelectedGenre("");
-    setMaxPrice("");
-    setSortOrder("newest");
     router.push("/browse");
+  };
+
+  // Handlers for filter changes
+  const handleSearchChange = (e) => {
+    setSearchInput(e.target.value);
+  };
+
+  const handleGenreChange = (e) => {
+    updateURL({ genre: e.target.value });
+  };
+
+  const handleMaxPriceChange = (e) => {
+    updateURL({ maxPrice: e.target.value });
+  };
+
+  const handleSortChange = (e) => {
+    updateURL({ sort: e.target.value });
   };
 
   return (
@@ -120,8 +138,8 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
               </span>
               <input
                 type="search"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
+                value={searchInput}
+                onChange={handleSearchChange}
                 placeholder="Title, description, genre..."
                 className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
               />
@@ -133,7 +151,7 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
               </span>
               <select
                 value={selectedGenre}
-                onChange={(event) => setSelectedGenre(event.target.value)}
+                onChange={handleGenreChange}
                 className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
               >
                 <option value="">All genres</option>
@@ -154,7 +172,7 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
                 min="0"
                 step="0.01"
                 value={maxPrice}
-                onChange={(event) => setMaxPrice(event.target.value)}
+                onChange={handleMaxPriceChange}
                 placeholder="Any price"
                 className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
               />
@@ -166,7 +184,7 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
               </span>
               <select
                 value={sortOrder}
-                onChange={(event) => setSortOrder(event.target.value)}
+                onChange={handleSortChange}
                 className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
               >
                 <option value="title-asc">Title: A to Z</option>
@@ -180,9 +198,9 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
             <p className="text-sm text-slate-400" aria-live="polite">
               Showing{" "}
               <span className="font-semibold text-slate-200">
-                {filteredEbooks.length}
+                {availableEbooks.length}
               </span>{" "}
-              {filteredEbooks.length === 1 ? "book" : "books"}
+              {availableEbooks.length === 1 ? "book" : "books"}
             </p>
             {(searchQuery ||
               selectedGenre ||
@@ -206,8 +224,8 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
             Array.from({ length: 8 }).map((_, index) => (
               <EbookCardSkeleton key={index} />
             ))
-          ) : filteredEbooks.length > 0 ? (
-            filteredEbooks.map((ebook) => {
+          ) : availableEbooks.length > 0 ? (
+            availableEbooks.map((ebook) => {
               const ebookId = ebook._id?.$oid || ebook._id;
               const isBookmarked = !!bookmarks[ebookId];
 
@@ -333,13 +351,9 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
               currentPage={pagination.page}
               totalPages={pagination.pages}
               onPageChange={(page) => {
-                const params = new URLSearchParams();
-                if (searchQuery) params.set("search", searchQuery);
-                if (selectedGenre) params.set("genre", selectedGenre);
-                if (maxPrice) params.set("maxPrice", maxPrice);
-                if (sortOrder && sortOrder !== "newest") params.set("sort", sortOrder);
+                const params = new URLSearchParams(searchParams.toString());
                 params.set("page", page);
-                window.location.href = `/browse?${params.toString()}`;
+                router.push(`/browse?${params.toString()}`);
               }}
             />
           </div>

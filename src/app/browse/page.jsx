@@ -10,7 +10,7 @@ const page = async ({ searchParams }) => {
     genre: params.genre || "",
     minPrice: params.minPrice || 0,
     maxPrice: params.maxPrice || "",
-    sort: params.sort || "newest",
+    sort: params.sort || "title-asc",
   };
 
   let data = null;
