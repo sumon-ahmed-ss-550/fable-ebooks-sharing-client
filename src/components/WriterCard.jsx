@@ -109,7 +109,7 @@ export default function WriterCard() {
 
             {/* Action Link */}
             <a
-              href={`/browse?writer=${encodeURIComponent(writer.name.toLowerCase())}`}
+              href="/browse"
               className="w-full py-2.5 bg-slate-800/80 hover:bg-amber-500 hover:text-slate-950 text-slate-300 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700/50 hover:border-amber-400 transition-all text-center"
             >
               View Ebooks

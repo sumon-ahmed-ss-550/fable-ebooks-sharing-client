@@ -24,6 +24,7 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
   const selectedGenre = searchParams.get("genre") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
   const sortOrder = searchParams.get("sort") || "title-asc";
+  const writerId = searchParams.get("writerId") || "";
 
   // Sync search input with URL on mount and URL changes
   useEffect(() => {
@@ -34,10 +35,6 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
   const genres = [
     ...new Set(availableEbooks.map((ebook) => ebook.genre).filter(Boolean)),
   ].sort((first, second) => first.localeCompare(second));
-
-  // Normalize selected genre for comparison
-  const normalizedSelectedGenre = selectedGenre.toLowerCase();
-  const normalizedGenres = genres.map(g => g.toLowerCase());
 
   // Debounced function to update URL params
   const updateURL = useCallback((params) => {
@@ -100,6 +97,9 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
   const clearFilters = () => {
     router.push("/browse");
   };
+
+  // Show writer info if filtering by writer
+  const showWriterFilter = writerId !== "";
 
   // Handlers for filter changes
   const handleSearchChange = (e) => {
@@ -205,11 +205,17 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
                 {availableEbooks.length}
               </span>{" "}
               {availableEbooks.length === 1 ? "book" : "books"}
+              {showWriterFilter && (
+                <span className="ml-2 text-amber-400">
+                  (by Writer)
+                </span>
+              )}
             </p>
             {(searchQuery ||
               selectedGenre ||
               maxPrice ||
-              sortOrder !== "title-asc") && (
+              sortOrder !== "title-asc" ||
+              showWriterFilter) && (
               <button
                 type="button"
                 onClick={clearFilters}

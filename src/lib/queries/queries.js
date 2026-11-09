@@ -16,6 +16,20 @@ export const getWriterSales = async (writerId) => {
   );
 };
 
+// get all writers with stats
+export const getAllWriters = async () => {
+  return await makeRequest(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/writer/all`,
+  );
+};
+
+// get writer profile with books
+export const getWriterProfile = async (writerId) => {
+  return await makeRequest(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/writer/${writerId}`,
+  );
+};
+
 // get one ebook by id
 export const getOneEbook = async (id) => {
   return await makeRequest(

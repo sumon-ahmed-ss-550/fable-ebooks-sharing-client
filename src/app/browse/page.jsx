@@ -11,6 +11,7 @@ const page = async ({ searchParams }) => {
     minPrice: params.minPrice || 0,
     maxPrice: params.maxPrice || "",
     sort: params.sort || "title-asc",
+    writerId: params.writerId || "",
   };
 
   let data = null;
