@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Search, BookOpen, DollarSign, Star } from "@gravity-ui/icons";
+import { Magnifier, BookOpen, ChartBar, Star } from "@gravity-ui/icons";
 
 export default function WritersList({ writers = [], isLoading = false }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -69,7 +69,7 @@ export default function WritersList({ writers = [], isLoading = false }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Magnifier className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search authors..."
@@ -182,7 +182,7 @@ export default function WritersList({ writers = [], isLoading = false }) {
                   <p className="text-[10px] text-slate-400">Books</p>
                 </div>
                 <div className="text-center">
-                  <DollarSign className="w-4 h-4 mx-auto mb-1 text-emerald-400" />
+                  <ChartBar className="w-4 h-4 mx-auto mb-1 text-emerald-400" />
                   <p className="text-lg font-bold text-slate-100">
                     {writer.stats?.totalSales || 0}
                   </p>

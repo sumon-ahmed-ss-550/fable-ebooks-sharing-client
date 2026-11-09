@@ -9,116 +9,23 @@ import { EbookCardSkeleton } from "./LoadingSkeleton";
 export default function EbookCard({ books = [], isLoading = false }) {
   const [selectedBook, setSelectedBook] = useState(null);
 
-  // Fallback mock data
-  const mockEbooks = [
-    {
-      id: "1",
-      title: "The Silent Ocean",
-      author: "John Carter",
-      genre: "Mystery",
-      rating: 4.9,
-      reviews: 128,
-      cover:
-        "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80",
-      price: "$9.99",
-      description:
-        "Deep beneath the calm waters lies a secret that could alter humanity forever. A detective takes on his toughest case yet.",
-      pages: 342,
-      published: "2024",
-    },
-    {
-      id: "2",
-      title: "Echoes of Eternity",
-      author: "Sarah Williams",
-      genre: "Sci-Fi",
-      rating: 4.8,
-      reviews: 95,
-      cover:
-        "https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=600&q=80",
-      price: "$12.50",
-      description:
-        "Traversing across multi-planetary colonizations, two scientists fight time and causality to save earth's last archive.",
-      pages: 410,
-      published: "2023",
-    },
-    {
-      id: "3",
-      title: "Whispers in the Mist",
-      author: "Michael Brown",
-      genre: "Fantasy",
-      rating: 4.7,
-      reviews: 210,
-      cover:
-        "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80",
-      price: "$8.99",
-      description:
-        "An ancient forest holds guardians of old spellcraft. When darkness creeps in, an unlikely hero steps forward.",
-      pages: 288,
-      published: "2024",
-    },
-    {
-      id: "4",
-      title: "Letters to Yesterday",
-      author: "Elena Rostova",
-      genre: "Romance",
-      rating: 4.9,
-      reviews: 340,
-      cover:
-        "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600&q=80",
-      price: "$7.99",
-      description:
-        "Found tucked inside a vintage bookstore in Paris, a series of wartime letters unlocks a love story that transcended decades.",
-      pages: 256,
-      published: "2023",
-    },
-    {
-      id: "5",
-      title: "The Quantum Paradox",
-      author: "Marcus Vance",
-      genre: "Sci-Fi",
-      rating: 4.6,
-      reviews: 82,
-      cover:
-        "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80",
-      price: "$14.99",
-      description:
-        "When artificial consciousness achieves emotional resonance, humanity must question what truly defines the human soul.",
-      pages: 520,
-      published: "2024",
-    },
-    {
-      id: "6",
-      title: "Shadows Over Venice",
-      author: "John Carter",
-      genre: "Thriller",
-      rating: 4.8,
-      reviews: 175,
-      cover:
-        "https://images.unsplash.com/photo-1476275466078-4007374efbbe?auto=format&fit=crop&w=600&q=80",
-      price: "$10.99",
-      description:
-        "A high-stakes thriller navigating political intrigue and covert societies across Venetian canals during Carnival week.",
-      pages: 380,
-      published: "2024",
-    },
-  ];
-
+  // Map real books data to expected format
   const ebooks = Array.isArray(books) && books.length > 0
     ? books.slice(0, 6).map((b) => ({
         id: b._id,
         title: b.title,
-        author: b.author || "Fable Author",
+        author: "Fable Author",
         genre: b.genre || "Featured",
-        rating: 4.9,
-        reviews: 88,
+        rating: 4.8,
+        reviews: Math.floor(Math.random() * 200) + 50,
         cover: b.coverImage,
         price: `$${Number(b.price || 0).toFixed(2)}`,
         description: b.description,
-        pages: 320,
+        pages: Math.floor(Math.random() * 400) + 200,
         published: b.createdAt ? new Date(b.createdAt).getFullYear() : "2024",
         isRealBook: true,
       }))
-    : mockEbooks;
+    : [];
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -159,7 +66,7 @@ export default function EbookCard({ books = [], isLoading = false }) {
           Array.from({ length: 6 }).map((_, index) => (
             <EbookCardSkeleton key={index} />
           ))
-        ) : (
+        ) : ebooks.length > 0 ? (
           ebooks.map((book) => (
           <motion.div
             key={book.id}
@@ -231,7 +138,19 @@ export default function EbookCard({ books = [], isLoading = false }) {
               </div>
             </div>
           </motion.div>
-        )))}
+        ))
+        ) : (
+          /* Empty State */
+          <div className="col-span-full text-center py-12 bg-slate-900/40 rounded-2xl border border-slate-800">
+            <p className="text-slate-400 mb-4">No featured ebooks available yet.</p>
+            <Link
+              href="/browse"
+              className="inline-block px-6 py-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl transition"
+            >
+              Browse All Ebooks
+            </Link>
+          </div>
+        )}
       </motion.div>
 
       {/* Quick View Modal */}
