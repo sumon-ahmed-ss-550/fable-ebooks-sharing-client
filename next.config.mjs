@@ -18,7 +18,7 @@ const nextConfig = {
         hostname: "i.ibb.co",
       },
     ],
-    unoptimized: false,
+    unoptimized: true,
   },
 };
 
