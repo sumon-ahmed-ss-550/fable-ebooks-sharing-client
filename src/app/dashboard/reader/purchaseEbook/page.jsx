@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { authClient } from "@/lib/auth-client";
 import { getReaderPurchasedEbooks } from "@/lib/queries/queries";
 import PurchasedEbooksList from "@/components/reader/PurchasedEbooksList";
+import GlobalLoadingSpinner from "@/components/GlobalLoadingSpinner";
+import { EbookCardSkeleton } from "@/components/LoadingSkeleton";
 
 const ReaderPurchaseEbookPage = () => {
   const { data: session } = authClient.useSession();
@@ -32,9 +34,16 @@ const ReaderPurchaseEbookPage = () => {
   return (
     <div className="min-h-screen p-4 md:p-8 text-slate-100 max-w-7xl mx-auto">
       {isLoading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-slate-400">Loading purchased ebooks...</p>
+        <div className="space-y-6">
+          <div className="text-center py-12">
+            <GlobalLoadingSpinner size="lg" />
+            <p className="mt-4 text-slate-400">Loading purchased ebooks...</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <EbookCardSkeleton />
+            <EbookCardSkeleton />
+            <EbookCardSkeleton />
+          </div>
         </div>
       ) : (
         <PurchasedEbooksList

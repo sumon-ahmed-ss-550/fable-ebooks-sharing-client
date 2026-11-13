@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSessionStatus } from "@/lib/queries/queries";
 import { authClient } from "@/lib/auth-client";
+import GlobalLoadingSpinner from "@/components/GlobalLoadingSpinner";
 
 export default function PaymentSuccess() {
   const router = useRouter();
@@ -110,8 +111,8 @@ export default function PaymentSuccess() {
       <div className="max-w-md w-full text-center">
         {status === "loading" && (
           <div className="text-slate-100">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-400 mx-auto mb-4"></div>
-            <h2 className="text-xl font-semibold mb-2">Verifying Payment...</h2>
+            <GlobalLoadingSpinner size="xl" />
+            <h2 className="text-xl font-semibold mb-2 mt-4">Verifying Payment...</h2>
             <p className="text-slate-400">Please wait while we confirm your payment.</p>
           </div>
         )}

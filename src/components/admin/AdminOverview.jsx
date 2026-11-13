@@ -27,6 +27,7 @@ import {
   Cell,
 } from "recharts";
 import { StatCardSkeleton } from "../LoadingSkeleton";
+import GlobalLoadingSpinner from "../GlobalLoadingSpinner";
 
 export default function AdminOverview({ stats = {}, isLoading = false }) {
   const {
@@ -132,9 +133,15 @@ export default function AdminOverview({ stats = {}, isLoading = false }) {
       {/* Metric Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {isLoading ? (
-          Array.from({ length: 4 }).map((_, index) => (
-            <StatCardSkeleton key={index} />
-          ))
+          <>
+            <div className="col-span-full text-center py-12">
+              <GlobalLoadingSpinner size="lg" />
+              <p className="mt-4 text-slate-400">Loading dashboard statistics...</p>
+            </div>
+            {Array.from({ length: 4 }).map((_, index) => (
+              <StatCardSkeleton key={index} />
+            ))}
+          </>
         ) : (
           statCards.map((card, idx) => (
             <Card

@@ -5,8 +5,10 @@ import { getOneEbook } from "@/lib/queries/queries";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import BuyNowButton from "./BuyNowButton";
+import { Suspense } from "react";
+import Loading from "./loading";
 
-const EbookDetailsPage = async ({ params }) => {
+const EbookDetailsContent = async ({ params }) => {
   const { id } = await params;
   const ebook = await getOneEbook(id);
 
@@ -89,6 +91,14 @@ const EbookDetailsPage = async ({ params }) => {
         </article>
       </div>
     </main>
+  );
+};
+
+const EbookDetailsPage = ({ params }) => {
+  return (
+    <Suspense fallback={<Loading />}>
+      <EbookDetailsContent params={params} />
+    </Suspense>
   );
 };
 

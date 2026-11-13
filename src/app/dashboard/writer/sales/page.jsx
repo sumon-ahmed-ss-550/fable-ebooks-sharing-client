@@ -6,6 +6,8 @@ import { getWriterSales } from "@/lib/queries/queries";
 import { Table, Chip } from "@heroui/react";
 import { ChartBar, Receipt, CreditCard } from "@gravity-ui/icons";
 import Link from "next/link";
+import GlobalLoadingSpinner from "@/components/GlobalLoadingSpinner";
+import { TableRowSkeleton } from "@/components/LoadingSkeleton";
 
 const WriterSalesPage = () => {
   const { data: session } = authClient.useSession();
@@ -61,9 +63,69 @@ const WriterSalesPage = () => {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-slate-400">Loading sales data...</p>
+        <div className="space-y-6">
+          <div className="text-center py-12">
+            <GlobalLoadingSpinner size="lg" />
+            <p className="mt-4 text-slate-400">Loading sales data...</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-6 rounded-2xl bg-[#18181b] border border-zinc-800 flex items-center justify-between">
+              <div>
+                <span className="text-xs text-zinc-400 uppercase tracking-wider block font-semibold">
+                  Total Books Sold
+                </span>
+                <span className="text-3xl font-black text-white font-mono mt-1 block">
+                  —
+                </span>
+                <span className="text-xs text-zinc-500 mt-1 block">
+                  Direct reader copies purchased
+                </span>
+              </div>
+              <div className="p-3 bg-indigo-500/10 text-indigo-400 rounded-xl border border-indigo-500/20">
+                <ChartBar className="w-6 h-6" />
+              </div>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-[#18181b] border border-zinc-800 flex items-center justify-between">
+              <div>
+                <span className="text-xs text-amber-400 uppercase tracking-wider block font-semibold">
+                  Total Royalties Earned
+                </span>
+                <span className="text-3xl font-black text-amber-400 font-mono mt-1 block">
+                  —
+                </span>
+                <span className="text-xs text-zinc-500 mt-1 block">
+                  Gross author payout balance
+                </span>
+              </div>
+              <div className="p-3 bg-amber-400/10 text-amber-400 rounded-xl border border-amber-400/20">
+                <CreditCard className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-[#18181b] rounded-2xl border border-zinc-800 shadow-md overflow-hidden p-2">
+            <Table>
+              <Table.ScrollContainer>
+                <Table.Content aria-label="Writer Sales Table">
+                  <Table.Header>
+                    <Table.Column isRowHeader className="text-zinc-400 font-semibold">Ebook Title</Table.Column>
+                    <Table.Column className="text-zinc-400 font-semibold">Buyer Name</Table.Column>
+                    <Table.Column className="text-zinc-400 font-semibold">Transaction ID</Table.Column>
+                    <Table.Column className="text-zinc-400 font-semibold">Price</Table.Column>
+                    <Table.Column className="text-zinc-400 font-semibold">Date</Table.Column>
+                    <Table.Column className="text-right text-zinc-400 font-semibold">Status</Table.Column>
+                  </Table.Header>
+
+                  <Table.Body>
+                    <TableRowSkeleton />
+                    <TableRowSkeleton />
+                    <TableRowSkeleton />
+                  </Table.Body>
+                </Table.Content>
+              </Table.ScrollContainer>
+            </Table>
+          </div>
         </div>
       ) : (
         <>
