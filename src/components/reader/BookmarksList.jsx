@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Button, Chip } from "@heroui/react";
 import { Bookmark, BookmarkFill, TrashBin } from "@gravity-ui/icons";
@@ -85,11 +84,10 @@ export default function BookmarksList({ initialBookmarks = [], user }) {
                 <div>
                   <div className="relative aspect-3/4 overflow-hidden bg-slate-950">
                     {book.coverImage && (
-                      <Image
+                      <img
                         src={book.coverImage}
                         alt={book.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     )}
                     <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-slate-950/80 backdrop-blur-md text-[10px] font-semibold text-amber-300 border border-amber-400/20">

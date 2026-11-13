@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { Modal, Button, useOverlayState } from "@heroui/react";
 import { BookOpen, Xmark } from "@gravity-ui/icons";
-import Image from "next/image";
 
 export default function EbookReaderModal({ ebook }) {
   const modalState = useOverlayState();
@@ -42,11 +41,10 @@ export default function EbookReaderModal({ ebook }) {
               <div className="flex items-center gap-3 min-w-0">
                 {ebook.coverImage && (
                   <div className="relative w-8 h-11 shrink-0 rounded overflow-hidden shadow">
-                    <Image
+                    <img
                       src={ebook.coverImage}
                       alt={ebook.title}
-                      fill
-                      className="object-cover"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 )}

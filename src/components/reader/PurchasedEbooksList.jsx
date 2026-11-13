@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Chip } from "@heroui/react";
 import { BookOpen, Magnifier } from "@gravity-ui/icons";
@@ -73,11 +72,10 @@ export default function PurchasedEbooksList({ books = [], user }) {
                 {/* Book Cover */}
                 <div className="relative aspect-3/4 overflow-hidden bg-slate-950">
                   {book.coverImage ? (
-                    <Image
+                    <img
                       src={book.coverImage}
                       alt={book.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-600">

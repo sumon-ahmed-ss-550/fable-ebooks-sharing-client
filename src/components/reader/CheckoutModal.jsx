@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { Card, Button, Chip } from "@heroui/react";
 import { CreditCard, CircleCheckFill, CircleExclamation, ShieldCheck, Lock } from "@gravity-ui/icons";
-import Image from "next/image";
 import { readerMakePurchase } from "@/lib/action/action";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -86,11 +85,10 @@ export default function CheckoutModal({ ebook, user, onPurchaseSuccess, onCancel
             <div className="flex gap-4 p-4 rounded-2xl bg-slate-950/60 border border-slate-800 items-center">
               <div className="relative w-16 h-22 shrink-0 rounded-lg overflow-hidden border border-slate-800 bg-slate-900">
                 {ebook.coverImage && (
-                  <Image
+                  <img
                     src={ebook.coverImage}
                     alt={ebook.title}
-                    fill
-                    className="object-cover"
+                    className="w-full h-full object-cover"
                   />
                 )}
               </div>

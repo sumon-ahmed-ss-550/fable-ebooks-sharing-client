@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 
 export default function WriterCard({ writers = [], isLoading = false }) {
   // Default badge based on writer stats
@@ -76,9 +75,7 @@ export default function WriterCard({ writers = [], isLoading = false }) {
                 {/* Avatar */}
                 <div className="relative mb-5">
                   {writer.image ? (
-                    <Image
-                      width={112}
-                      height={112}
+                    <img
                       src={writer.image}
                       alt={writer.name}
                       loading="eager"

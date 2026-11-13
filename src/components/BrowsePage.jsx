@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
@@ -245,7 +244,7 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
                   className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 shadow-xl shadow-black/10 transition-all duration-300 hover:-translate-y-1 hover:border-amber-400/30 hover:shadow-2xl hover:shadow-violet-950/20"
                 >
                   <div className="relative h-72 w-full overflow-hidden bg-slate-950">
-                    <Image
+                    <img
                       src={ebook.coverImage}
                       alt={ebook.title || "Ebook Cover"}
                       loading="eager"

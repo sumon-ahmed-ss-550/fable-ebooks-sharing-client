@@ -8,7 +8,6 @@ import {
   CircleCheckFill,
   CircleExclamation,
 } from "@gravity-ui/icons";
-import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { updateEbook, writerInsertEbook } from "@/lib/action/action";
@@ -255,11 +254,8 @@ const WriterAddEbookForm = ({ ebook = null, onSuccess }) => {
 
               {imagePreview && (
                 <div className="relative w-32 h-44 shrink-0 rounded-lg overflow-hidden border-2 border-default-300 shadow-sm">
-                  <Image
-                    width={128}
-                    height={176}
+                  <img
                     loading="eager"
-                    unoptimized
                     src={imagePreview}
                     alt={`${formData.title || "Ebook"} cover preview`}
                     className="w-full h-full object-cover"

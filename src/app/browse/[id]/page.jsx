@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getOneEbook } from "@/lib/queries/queries";
@@ -34,13 +33,10 @@ const EbookDetailsContent = async ({ params }) => {
 
         <article className="grid overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 shadow-2xl shadow-black/20 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div className="relative min-h-[24rem] bg-slate-950 sm:min-h-[34rem]">
-            <Image
+            <img
               src={ebook.coverImage}
               alt={ebook.title || "Ebook cover"}
-              fill
-              sizes="(max-width: 768px) 100vw, 40vw"
-              className="object-contain"
-              priority
+              className="w-full h-full object-contain"
             />
           </div>
 

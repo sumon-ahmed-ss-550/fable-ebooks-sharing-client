@@ -5,7 +5,6 @@ import { Table, Button, Chip } from "@heroui/react";
 import { BookOpen, TrashBin, Eye, EyeSlash, Magnifier } from "@gravity-ui/icons";
 import { adminChangeEbookStatus, adminDeleteEbook } from "@/lib/action/action";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import SimplePagination from "../Pagination";
 
 export default function AdminEbooksTable({ initialEbooks = [] }) {
@@ -142,11 +141,10 @@ export default function AdminEbooksTable({ initialEbooks = [] }) {
                         <div className="flex items-center gap-3">
                           {book.coverImage ? (
                             <div className="relative w-8 h-11 shrink-0 rounded overflow-hidden shadow border border-slate-800">
-                              <Image
+                              <img
                                 src={book.coverImage}
                                 alt={book.title}
-                                fill
-                                className="object-cover"
+                                className="w-full h-full object-cover"
                               />
                             </div>
                           ) : (

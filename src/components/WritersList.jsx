@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { Magnifier, BookOpen, ChartBar, Star } from "@gravity-ui/icons";
 
@@ -144,11 +143,9 @@ export default function WritersList({ writers = [], isLoading = false }) {
               <div className="flex items-start gap-4 mb-4">
                 <div className="relative">
                   {writer.image ? (
-                    <Image
+                    <img
                       src={writer.image}
                       alt={writer.name}
-                      width={80}
-                      height={80}
                       className="w-20 h-20 rounded-full object-cover border-2 border-slate-700"
                     />
                   ) : (

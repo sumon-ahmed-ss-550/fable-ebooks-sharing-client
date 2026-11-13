@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { EbookCardSkeleton } from "./LoadingSkeleton";
 
@@ -87,9 +86,7 @@ export default function EbookCard({ books = [], isLoading = false }) {
           >
             {/* Cover Image Container */}
             <div className="relative aspect-3/4 overflow-hidden bg-slate-950">
-              <Image
-                width={400}
-                height={533}
+              <img
                 src={book.cover}
                 alt={`${book.title} ebook cover`}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -174,9 +171,7 @@ export default function EbookCard({ books = [], isLoading = false }) {
                 ✕
               </button>
               <div className="flex gap-4">
-                <Image
-                  width={112}
-                  height={168}
+                <img
                   src={selectedBook.cover}
                   alt={selectedBook.title}
                   className="w-28 h-40 object-cover rounded-xl border border-slate-800 shadow shrink-0"

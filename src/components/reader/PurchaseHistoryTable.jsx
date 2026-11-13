@@ -4,7 +4,6 @@ import React from "react";
 import { Table, Chip, Button } from "@heroui/react";
 import { ClockArrowRotateLeft, Receipt, BookOpen } from "@gravity-ui/icons";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function PurchaseHistoryTable({ purchases = [] }) {
   const totalSpent = purchases.reduce(
@@ -111,11 +110,10 @@ export default function PurchaseHistoryTable({ purchases = [] }) {
                         <div className="flex items-center gap-3">
                           {item.ebookCoverImage ? (
                             <div className="relative w-9 h-12 shrink-0 rounded overflow-hidden shadow border border-slate-800">
-                              <Image
+                              <img
                                 src={item.ebookCoverImage}
                                 alt={item.ebookTitle}
-                                fill
-                                className="object-cover"
+                                className="w-full h-full object-cover"
                               />
                             </div>
                           ) : (
