@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Fable - Ebook Sharing Platform",
   description: "Discover, purchase, and read original ebooks from independent writers",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({ children }) {
