@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSessionStatus } from "@/lib/queries/queries";
 import { authClient } from "@/lib/auth-client";
 import GlobalLoadingSpinner from "@/components/GlobalLoadingSpinner";
 
-export default function PaymentSuccess() {
+function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
@@ -172,5 +172,20 @@ export default function PaymentSuccess() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function PaymentSuccess() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center">
+          <GlobalLoadingSpinner size="xl" />
+          <h2 className="text-xl font-semibold mb-2 mt-4">Loading...</h2>
+        </div>
+      </div>
+    }>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }
