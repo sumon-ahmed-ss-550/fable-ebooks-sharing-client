@@ -15,8 +15,16 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const [isMounted, setIsMounted] = useState(false);
   const [bookmarks, setBookmarks] = useState({});
   const [searchInput, setSearchInput] = useState("");
+
+  // Show skeleton on first mount for smooth UX
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const showSkeleton = !isMounted;
 
   // Get filter values from URL
   const searchQuery = searchParams.get("search") || "";
@@ -228,7 +236,7 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
 
         {/* ebooks card grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {isLoading ? (
+          {showSkeleton ? (
             // Show skeleton loaders while loading
             Array.from({ length: 8 }).map((_, index) => (
               <EbookCardSkeleton key={index} />
