@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { WriterCardSkeleton } from "./LoadingSkeleton";
 
 export default function WriterCard({ writers = [], isLoading = false }) {
   // Default badge based on writer stats
@@ -42,9 +43,10 @@ export default function WriterCard({ writers = [], isLoading = false }) {
 
       {/* Loading State */}
       {isLoading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400 mx-auto"></div>
-          <p className="mt-4 text-slate-400">Loading authors...</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          <WriterCardSkeleton />
+          <WriterCardSkeleton />
+          <WriterCardSkeleton />
         </div>
       ) : topWriters.length > 0 ? (
         /* Writers Grid */

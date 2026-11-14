@@ -1,15 +1,24 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { GenreCardSkeleton } from "./LoadingSkeleton";
 
 export default function GenreGrid({ genres = [], isLoading = false }) {
   return (
     <div>
       {/* Loading State */}
       {isLoading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400 mx-auto"></div>
-          <p className="mt-4 text-slate-400">Loading genres...</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+          <GenreCardSkeleton />
+          <GenreCardSkeleton />
+          <GenreCardSkeleton />
+          <GenreCardSkeleton />
+          <GenreCardSkeleton />
+          <GenreCardSkeleton />
+          <GenreCardSkeleton />
+          <GenreCardSkeleton />
+          <GenreCardSkeleton />
+          <GenreCardSkeleton />
         </div>
       ) : genres.length > 0 ? (
         /* Genres Grid */

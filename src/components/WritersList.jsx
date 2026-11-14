@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Magnifier, BookOpen, ChartBar, Star } from "@gravity-ui/icons";
+import { WriterCardSkeleton } from "./LoadingSkeleton";
 
 export default function WritersList({ writers = [], isLoading = false }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -112,9 +113,13 @@ export default function WritersList({ writers = [], isLoading = false }) {
 
       {/* Writers Grid */}
       {isLoading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400 mx-auto"></div>
-          <p className="mt-4 text-slate-400">Loading authors...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <WriterCardSkeleton />
+          <WriterCardSkeleton />
+          <WriterCardSkeleton />
+          <WriterCardSkeleton />
+          <WriterCardSkeleton />
+          <WriterCardSkeleton />
         </div>
       ) : sortedWriters.length > 0 ? (
         <motion.div
