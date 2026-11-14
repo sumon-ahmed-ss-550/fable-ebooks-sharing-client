@@ -4,15 +4,16 @@ import { getPublishedEbooks } from "@/lib/queries/queries";
 export const dynamic = 'force-dynamic';
 
 export default async function BrowsePage({ searchParams }) {
+  const params = await searchParams;
   const queryParams = {
-    page: searchParams.page || 1,
-    limit: searchParams.limit || 12,
-    search: searchParams.search || "",
-    genre: searchParams.genre || "",
-    minPrice: searchParams.minPrice || 0,
-    maxPrice: searchParams.maxPrice || "",
-    sort: searchParams.sort || "title-asc",
-    writerId: searchParams.writerId || "",
+    page: parseInt(params.page) || 1,
+    limit: parseInt(params.limit) || 12,
+    search: params.search || "",
+    genre: params.genre || "",
+    minPrice: parseFloat(params.minPrice) || 0,
+    maxPrice: params.maxPrice || "",
+    sort: params.sort || "title-asc",
+    writerId: params.writerId || "",
   };
 
   let data = null;
