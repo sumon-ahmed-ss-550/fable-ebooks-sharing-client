@@ -1,41 +1,29 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 import Browse from "@/components/BrowsePage";
 import { getPublishedEbooks } from "@/lib/queries/queries";
 
-export default function BrowsePage() {
-  const searchParams = useSearchParams();
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+export const dynamic = 'force-dynamic';
 
+export default async function BrowsePage({ searchParams }) {
   const queryParams = {
-    page: searchParams.get("page") || 1,
-    limit: searchParams.get("limit") || 12,
-    search: searchParams.get("search") || "",
-    genre: searchParams.get("genre") || "",
-    minPrice: searchParams.get("minPrice") || 0,
-    maxPrice: searchParams.get("maxPrice") || "",
-    sort: searchParams.get("sort") || "title-asc",
-    writerId: searchParams.get("writerId") || "",
+    page: searchParams.page || 1,
+    limit: searchParams.limit || 12,
+    search: searchParams.search || "",
+    genre: searchParams.genre || "",
+    minPrice: searchParams.minPrice || 0,
+    maxPrice: searchParams.maxPrice || "",
+    sort: searchParams.sort || "title-asc",
+    writerId: searchParams.writerId || "",
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await getPublishedEbooks(queryParams);
-        setData(result);
-      } catch (err) {
-        console.error("Error fetching ebooks:", err);
-        setData({ ebooks: [], pagination: null });
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  let data = null;
+  let isLoading = false;
 
-    fetchData();
-  }, [queryParams]);
+  try {
+    data = await getPublishedEbooks(queryParams);
+  } catch (err) {
+    isLoading = true;
+    data = { ebooks: [], pagination: null };
+  }
 
   return (
     <div>

@@ -1,42 +1,31 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import { getPublishedEbooks } from "@/lib/queries/queries";
 import GenreGrid from "@/components/GenreGrid";
 
-export default function GenresPage() {
-  const [genres, setGenres] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+export const dynamic = 'force-dynamic';
 
-  useEffect(() => {
-    const fetchGenres = async () => {
-      try {
-        const publishedBooks = await getPublishedEbooks();
+export default async function GenresPage() {
+  let publishedBooks = [];
+  let isLoading = false;
 
-        // Extract unique genres from published books
-        const genreMap = new Map();
-        publishedBooks.ebooks?.forEach((book) => {
-          if (book.genre) {
-            const count = genreMap.get(book.genre) || 0;
-            genreMap.set(book.genre, count + 1);
-          }
-        });
+  try {
+    publishedBooks = await getPublishedEbooks();
+  } catch (err) {
+    publishedBooks = [];
+    isLoading = true;
+  }
 
-        const genreList = Array.from(genreMap.entries())
-          .map(([name, count]) => ({ name, count }))
-          .sort((a, b) => b.count - a.count);
+  // Extract unique genres from published books
+  const genreMap = new Map();
+  publishedBooks.ebooks?.forEach((book) => {
+    if (book.genre) {
+      const count = genreMap.get(book.genre) || 0;
+      genreMap.set(book.genre, count + 1);
+    }
+  });
 
-        setGenres(genreList);
-      } catch (err) {
-        console.error("Error fetching genres:", err);
-        setGenres([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchGenres();
-  }, []);
+  const genres = Array.from(genreMap.entries())
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
 
   return (
     <div className="min-h-screen bg-slate-950">

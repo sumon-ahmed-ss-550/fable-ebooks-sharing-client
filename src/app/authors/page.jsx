@@ -1,32 +1,25 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import { getAllWriters } from "@/lib/queries/queries";
 import WritersList from "@/components/WritersList";
 
-export default function AuthorsPage() {
-  const [writers, setWriters] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+export const dynamic = 'force-dynamic';
 
-  useEffect(() => {
-    const fetchWriters = async () => {
-      try {
-        const data = await getAllWriters();
-        setWriters(data);
-      } catch (err) {
-        console.error("Error fetching writers:", err);
-        setWriters([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+const AuthorsPage = async () => {
+  let writers = [];
+  let isLoading = false;
 
-    fetchWriters();
-  }, []);
+  try {
+    writers = await getAllWriters();
+  } catch (err) {
+    console.error("Error fetching writers:", err);
+    writers = [];
+    isLoading = true;
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <WritersList writers={writers} isLoading={isLoading} />
     </div>
   );
-}
+};
+
+export default AuthorsPage;

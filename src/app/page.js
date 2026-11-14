@@ -5,6 +5,8 @@ import WriterCard from "@/components/WriterCard";
 import { getPublishedEbooks, getAllWriters } from "@/lib/queries/queries";
 import HomeWrapper from "./HomeWrapper";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   let publishedBooks = [];
   let writers = [];

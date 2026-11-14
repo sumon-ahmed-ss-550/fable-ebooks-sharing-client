@@ -16,10 +16,6 @@ export default function HomeWrapper({ books, writers, genres }) {
   // Show skeleton only on first mount for smooth UX
   const isLoading = !isMounted;
 
-  console.log("HomeWrapper render - isMounted:", isMounted);
-  console.log("HomeWrapper render - isLoading:", isLoading);
-  console.log("HomeWrapper render - books length:", books?.length);
-
   return (
     <div>
       {/* banner section */}

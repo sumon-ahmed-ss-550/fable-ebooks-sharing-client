@@ -8,10 +8,6 @@ import { EbookCardSkeleton } from "./LoadingSkeleton";
 export default function EbookCard({ books = [], isLoading = false }) {
   const [selectedBook, setSelectedBook] = useState(null);
 
-  console.log("EbookCard - props received:", { books, isLoading });
-  console.log("EbookCard - books length:", books?.length);
-  console.log("EbookCard - books is array:", Array.isArray(books));
-
   // Map real books data to expected format
   const ebooks = Array.isArray(books) && books.length > 0
     ? books.slice(0, 6).map((b) => {
@@ -33,8 +29,6 @@ export default function EbookCard({ books = [], isLoading = false }) {
         };
       })
     : [];
-
-  console.log("EbookCard - mapped ebooks length:", ebooks.length);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
