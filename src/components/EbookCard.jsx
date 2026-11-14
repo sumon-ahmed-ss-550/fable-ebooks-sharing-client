@@ -87,10 +87,13 @@ export default function EbookCard({ books = [], isLoading = false }) {
             {/* Cover Image Container */}
             <div className="relative aspect-3/4 overflow-hidden bg-slate-950">
               <img
-                src={book.cover}
+                src={book.cover || "/placeholder-book.jpg"}
                 alt={`${book.title} ebook cover`}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 loading="eager"
+                onError={(e) => {
+                  e.target.src = "/placeholder-book.jpg";
+                }}
               />
               <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
 

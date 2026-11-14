@@ -248,9 +248,7 @@ const Browse = ({ ebooks = [], pagination = null, isLoading = false }) => {
                       src={ebook.coverImage}
                       alt={ebook.title || "Ebook Cover"}
                       loading="eager"
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      className="object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+                      className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
                     />
 
                     <span className="absolute left-3 top-3 z-10 rounded-full border border-amber-400/20 bg-slate-950/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-300 shadow-md backdrop-blur-md">
