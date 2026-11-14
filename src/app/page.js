@@ -3,11 +3,11 @@ import EbookCard from "@/components/EbookCard";
 import GenreCard from "@/components/GenreCard";
 import WriterCard from "@/components/WriterCard";
 import { getPublishedEbooks, getAllWriters } from "@/lib/queries/queries";
+import HomeWrapper from "./HomeWrapper";
 
 export default async function Home() {
   let publishedBooks = [];
   let writers = [];
-  let isLoading = false;
 
   try {
     [publishedBooks, writers] = await Promise.all([
@@ -15,14 +15,14 @@ export default async function Home() {
       getAllWriters(),
     ]);
   } catch (err) {
-    publishedBooks = [];
+    console.error("Error fetching data:", err);
+    publishedBooks = { ebooks: [] };
     writers = [];
-    isLoading = true;
   }
 
   // Extract unique genres from published books
   const genreMap = new Map();
-  publishedBooks.ebooks?.forEach((book) => {
+  publishedBooks?.ebooks?.forEach((book) => {
     if (book.genre) {
       const count = genreMap.get(book.genre) || 0;
       genreMap.set(book.genre, count + 1);
@@ -34,18 +34,10 @@ export default async function Home() {
     .sort((a, b) => b.count - a.count);
 
   return (
-    <div>
-      {/* banner section */}
-      <BannerSection />
-
-      {/* ebook card */}
-      <EbookCard books={publishedBooks.ebooks || []} isLoading={isLoading} />
-
-      {/* ebook writers */}
-      <WriterCard writers={writers} isLoading={isLoading} />
-
-      {/* genre card */}
-      <GenreCard genres={genres} isLoading={isLoading} />
-    </div>
+    <HomeWrapper
+      books={publishedBooks?.ebooks || []}
+      writers={writers || []}
+      genres={genres}
+    />
   );
 }

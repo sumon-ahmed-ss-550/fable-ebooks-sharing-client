@@ -8,6 +8,10 @@ import { EbookCardSkeleton } from "./LoadingSkeleton";
 export default function EbookCard({ books = [], isLoading = false }) {
   const [selectedBook, setSelectedBook] = useState(null);
 
+  console.log("EbookCard - props received:", { books, isLoading });
+  console.log("EbookCard - books length:", books?.length);
+  console.log("EbookCard - books is array:", Array.isArray(books));
+
   // Map real books data to expected format
   const ebooks = Array.isArray(books) && books.length > 0
     ? books.slice(0, 6).map((b) => {
@@ -30,6 +34,8 @@ export default function EbookCard({ books = [], isLoading = false }) {
       })
     : [];
 
+  console.log("EbookCard - mapped ebooks length:", ebooks.length);
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Section Header */}
@@ -51,27 +57,31 @@ export default function EbookCard({ books = [], isLoading = false }) {
       </div>
 
       {/* Staggered Grid Container */}
-      <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-50px" }}
-        variants={{
-          hidden: { opacity: 0 },
-          visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.12 },
-          },
-        }}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
-      >
-        {isLoading ? (
-          // Show skeleton loaders while loading
-          Array.from({ length: 6 }).map((_, index) => (
+      {isLoading ? (
+        // Show skeleton loaders while loading - without motion animation
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          {Array.from({ length: 6 }).map((_, index) => (
             <EbookCardSkeleton key={index} />
-          ))
-        ) : ebooks.length > 0 ? (
-          ebooks.map((book) => (
-          <motion.div
+          ))}
+        </div>
+      ) : (
+        // Show actual books with animation
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: { staggerChildren: 0.12 },
+            },
+          }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+        >
+          {ebooks && ebooks.length > 0 ? (
+            ebooks.map((book) => (
+              <motion.div
             key={book.id}
             variants={{
               hidden: { opacity: 0, y: 24 },
@@ -142,7 +152,7 @@ export default function EbookCard({ books = [], isLoading = false }) {
               </div>
             </div>
           </motion.div>
-        ))
+            ))
         ) : (
           /* Empty State */
           <div className="col-span-full text-center py-12 bg-slate-900/40 rounded-2xl border border-slate-800">
@@ -156,6 +166,7 @@ export default function EbookCard({ books = [], isLoading = false }) {
           </div>
         )}
       </motion.div>
+      )}
 
       {/* Quick View Modal */}
       <AnimatePresence>
